@@ -6723,6 +6723,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"class-variance-authority@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "class-variance-authority@npm:0.7.1"
+  dependencies:
+    clsx: ^2.1.1
+  checksum: e05ba26ef9ec38f7c675047ce366b067d60af6c954dba08f7802af19a9460a534ae752d8fe1294fff99d0fa94a669b16ccebd87e8a20f637c0736cf2751dd2c5
+  languageName: node
+  linkType: hard
+
 "clean-stack@npm:^2.0.0":
   version: 2.2.0
   resolution: "clean-stack@npm:2.2.0"
@@ -6841,7 +6850,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@npm:2.1.1":
+"clsx@npm:2.1.1, clsx@npm:^2.1.1":
   version: 2.1.1
   resolution: "clsx@npm:2.1.1"
   checksum: acd3e1ab9d8a433ecb3cc2f6a05ab95fe50b4a3cfc5ba47abb6cbf3754585fcb87b84e90c822a1f256c4198e3b41c7f6c391577ffc8678ad587fc0976b24fd57
@@ -11938,6 +11947,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lucide-react@npm:^0.536.0":
+  version: 0.536.0
+  resolution: "lucide-react@npm:0.536.0"
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 49324827a20507b43d9dfd5d4a7cba7aa8b4dd5b5230b6628d02dbdc3f495481f0601b0ff00ffe125cb62cfeb15da1ef7783884250430d4bc5b86741de522b8a
+  languageName: node
+  linkType: hard
+
 "main-event@npm:^1.0.1":
   version: 1.0.1
   resolution: "main-event@npm:1.0.1"
@@ -14794,8 +14812,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "se-2@workspace:."
   dependencies:
+    class-variance-authority: ^0.7.1
+    clsx: ^2.1.1
     husky: ~9.1.6
     lint-staged: ~13.2.2
+    lucide-react: ^0.536.0
+    tailwind-merge: ^3.3.1
+    tw-animate-css: ^1.3.6
   languageName: unknown
   linkType: soft
 
@@ -15803,6 +15826,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tailwind-merge@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "tailwind-merge@npm:3.3.1"
+  checksum: ace3675227d86f1def95b25b7f6793268a6ab2f340b43ef64ad25646588d2b1d87714cd60db6947bfdb5bb85be3bb6ce1802021620c541ef7a9c3faa05915f2b
+  languageName: node
+  linkType: hard
+
 "tailwindcss@npm:4.0.15":
   version: 4.0.15
   resolution: "tailwindcss@npm:4.0.15"
@@ -16183,6 +16213,13 @@ __metadata:
     debug: ^4.4.1
     make-fetch-happen: ^14.0.3
   checksum: 1a45a055e97041459aacca576e439baf0517d88db3eb600479b57fb60c2403dc193048135f1a2612378dc0b00c8437ec990b132d404b0a5e7471bf2e2824d2aa
+  languageName: node
+  linkType: hard
+
+"tw-animate-css@npm:^1.3.6":
+  version: 1.3.6
+  resolution: "tw-animate-css@npm:1.3.6"
+  checksum: d3834e0aef85ffb84b79e1f8421b44f743036bf7b34d7eb85914daa662a1667ac4a4f09e0bd80995dc4c14f3cca6de4bc486e6a724165e36c353b2363ff563d2
   languageName: node
   linkType: hard
 
