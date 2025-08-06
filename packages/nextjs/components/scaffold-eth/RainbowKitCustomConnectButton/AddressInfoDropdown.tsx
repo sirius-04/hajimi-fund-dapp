@@ -131,7 +131,7 @@ export const AddressInfoDropdown = ({
                   href={blockExplorerAddressLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 cursor-pointer"
                 >
                   <ArrowTopRightOnSquareIcon className="h-4 w-4" />
                   View on Block Explorer
@@ -141,7 +141,10 @@ export const AddressInfoDropdown = ({
 
             {/* Switch Network */}
             {allowedNetworks.length > 1 && (
-              <DropdownMenuItem onClick={() => setSelectingNetwork(true)} className="flex items-center gap-2">
+              <DropdownMenuItem
+                onClick={() => setSelectingNetwork(true)}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <ArrowsRightLeftIcon className="h-4 w-4" />
                 Switch Network
               </DropdownMenuItem>
@@ -163,7 +166,10 @@ export const AddressInfoDropdown = ({
             {/* <DropdownMenuSeparator /> */}
 
             {/* Disconnect */}
-            <DropdownMenuItem onClick={() => disconnect()} className="flex items-center gap-2 text-destructive">
+            <DropdownMenuItem
+              onClick={() => disconnect()}
+              className="flex items-center gap-2 text-destructive dark:text-red-500 cursor-pointer"
+            >
               <ArrowLeftOnRectangleIcon className="h-4 w-4" />
               Disconnect
             </DropdownMenuItem>
