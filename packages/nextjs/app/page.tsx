@@ -25,7 +25,7 @@ const Home: NextPage = () => {
   const [isOpen, setIsOpen] = useState(true);
   const hasMountedOnce = useRef(false);
 
-  // for bright panel toggle
+  // for right panel toggle
   useEffect(() => {
     if (isOpen) {
       hasMountedOnce.current = true;
@@ -43,7 +43,7 @@ const Home: NextPage = () => {
           transition={{ duration: 0.3 }}
         >
           <div className="flex flex-col gap-2 px-3 py-2 md:p-5">
-            {/* Top row */}
+            {/* ----- filter buttons ----- */}
             <div className="flex  justify-between overflow-x-scroll">
               <div className="flex gap-2">
                 <Button variant="outline" size="lg" className="cursor-pointer">
@@ -64,15 +64,14 @@ const Home: NextPage = () => {
               )}
             </div>
 
-            {/* Bottom row */}
-
+            {/* ----- Main content -----  */}
             <div className="h-full w-full mt-3">
               <ProgramCard />
             </div>
           </div>
         </motion.div>
 
-        {/* Right panel with own scroll */}
+        {/* -----  right panel -----  */}
         <div className="fixed top-18">
           <AnimatePresence>
             {isOpen && (
@@ -84,6 +83,7 @@ const Home: NextPage = () => {
                 transition={{ duration: 0.3 }}
               >
                 <div className="flex justify-between">
+                  {/* -----  action buttons -----  */}
                   <div className="flex gap-x-2">
                     {actionButtons.map((button, idx) => (
                       <Button variant="outline" className="cursor-pointer" key={idx}>
@@ -97,12 +97,13 @@ const Home: NextPage = () => {
                   </Button>
                 </div>
 
+                {/* -----  table content -----  */}
                 <div className="mt-4 max-h-[70%] h-full overflow-y-auto">
                   <Table>
                     <TableHeader className="text-muted-foreground">
                       <TableRow>
                         <TableHead className="text-muted-foreground">Program</TableHead>
-                        <TableHead className="text-muted-foreground text-right">eth</TableHead>
+                        <TableHead className="text-muted-foreground text-right">ETH</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody className="cursor-pointer text-md">
@@ -119,7 +120,10 @@ const Home: NextPage = () => {
                           <TableCell className="text-right">
                             <Link href="/program" className="block w-full h-full">
                               <div className="flex gap-2 items-center justify-end">
-                                <p>{data.eth}</p> <FaEthereum size="20" />
+                                <p>{data.eth}</p>
+                                <div className="text-violet-400">
+                                  <FaEthereum size="20" />
+                                </div>
                               </div>
                             </Link>
                           </TableCell>

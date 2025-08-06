@@ -22,9 +22,8 @@ export const SwitchTheme = ({ className }: { className?: string }) => {
   if (!mounted) return null;
 
   return (
-    <Button onClick={handleToggle} variant="ghost">
+    <Button onClick={handleToggle} variant="ghost" className="cursor-pointer">
       {isDarkMode ? <MoonIcon className="h-4 w-4" /> : <SunIcon className="h-4 w-4" />}
-      {/* <span className="text-sm">{isDarkMode ? "Dark" : "Light"}</span> */}
     </Button>
   );
 };
