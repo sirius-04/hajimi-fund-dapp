@@ -1,72 +1,162 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Award,
+  Brush,
+  ChevronsLeft,
+  ChevronsRight,
+  GraduationCap,
+  Landmark,
+  MonitorSmartphone,
+  Scroll,
+} from "lucide-react";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { Address } from "~~/components/scaffold-eth";
+import { FaEthereum } from "react-icons/fa";
+import { ProgramCard } from "~~/components/ProgramCard";
+import { BlockieAvatar } from "~~/components/scaffold-eth";
+import { Button } from "~~/components/ui/button";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "~~/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~~/components/ui/tabs";
 
 const Home: NextPage = () => {
-  const { address: connectedAddress } = useAccount();
+  const [isOpen, setIsOpen] = useState(true);
+  const hasMountedOnce = useRef(false);
+
+  // for bright panel toggle
+  useEffect(() => {
+    if (isOpen) {
+      hasMountedOnce.current = true;
+    }
+  }, [isOpen]);
 
   return (
-    <>
-      <div className="flex items-center flex-col grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-          </h1>
-          <div className="flex justify-center items-center space-x-2 flex-col">
-            <p className="my-2 font-medium">Connected Address:</p>
-            <Address address={connectedAddress} />
-          </div>
+    <div className="relative w-full mt-18">
+      <div className="flex  w-full ">
+        {/* Left scrollable content */}
+        <motion.div
+          className="flex-shrink-0 w-full"
+          initial={{ width: "70%" }}
+          animate={{ width: isOpen ? "70%" : "100%" }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="flex flex-col gap-2 px-3 py-2 md:p-5">
+            {/* Top row */}
+            <div className="flex  justify-between overflow-x-scroll">
+              <div className="flex gap-2">
+                <Button variant="outline" size="lg" className="cursor-pointer">
+                  All
+                </Button>
+                {filterButtons.map((button, idx) => (
+                  <Button key={idx} variant="outline" size="lg" className="cursor-pointer">
+                    {button.icon}
+                    {button.label}
+                  </Button>
+                ))}
+              </div>
 
-          <p className="text-center text-lg">
-            Get started by editing{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/nextjs/app/page.tsx
-            </code>
-          </p>
-          <p className="text-center text-lg">
-            Edit your smart contract{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              YourContract.sol
-            </code>{" "}
-            in{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/hardhat/contracts
-            </code>
-          </p>
-        </div>
-
-        <div className="grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col md:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contracts
-                </Link>{" "}
-                tab.
-              </p>
+              {!isOpen && (
+                <Button onClick={() => setIsOpen(true)} variant="outline" className=" cursor-pointer">
+                  <ChevronsLeft />
+                </Button>
+              )}
             </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
+
+            {/* Bottom row */}
+
+            <div className="h-full w-full mt-3">
+              <ProgramCard />
             </div>
           </div>
+        </motion.div>
+
+        {/* Right panel with own scroll */}
+        <div className="fixed top-18">
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                className="fixed z-0 right-0 top-18 h-full  px-3 py-2 md:p-5 hidden md:block "
+                initial={hasMountedOnce.current ? { x: "100%" } : false}
+                animate={{ x: 0, width: "30%" }}
+                exit={{ x: "100%" }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex justify-between">
+                  <div className="flex gap-x-2">
+                    {actionButtons.map((button, idx) => (
+                      <Button variant="outline" className="cursor-pointer" key={idx}>
+                        {button.icon}
+                        {button.label}
+                      </Button>
+                    ))}
+                  </div>
+                  <Button variant="outline" className="cursor-pointer" onClick={() => setIsOpen(false)}>
+                    <ChevronsRight />
+                  </Button>
+                </div>
+
+                <div className="mt-4 max-h-[70%] h-full overflow-y-auto">
+                  <Table>
+                    <TableHeader className="text-muted-foreground">
+                      <TableRow>
+                        <TableHead className="text-muted-foreground">Program</TableHead>
+                        <TableHead className="text-muted-foreground text-right">eth</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="cursor-pointer text-md">
+                      {tableDate.map((data, index) => (
+                        <TableRow key={index} className="hover:underline h-16">
+                          <TableCell className="font-medium">
+                            <Link href="/program" className="block w-full h-full">
+                              <div className="flex gap-2 items-center">
+                                <BlockieAvatar address="0xfc9400703dA075a14C9Cc4b87726FA90aDc055F2" size={25} />
+                                <p>{data.programName}</p>
+                              </div>
+                            </Link>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Link href="/program" className="block w-full h-full">
+                              <div className="flex gap-2 items-center justify-end">
+                                <p>{data.eth}</p> <FaEthereum size="20" />
+                              </div>
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
 export default Home;
+
+const filterButtons = [
+  { icon: <MonitorSmartphone />, label: "Computer Science" },
+  { icon: <Brush />, label: "Art" },
+  { icon: <Landmark />, label: "Finance" },
+  { icon: <Scroll />, label: "Degree" },
+];
+
+const actionButtons = [
+  { icon: <GraduationCap />, label: "Program" },
+  { icon: <Award />, label: "Top " },
+];
+
+const tableDate = [
+  { programName: "Degree ABC Scholarship", eth: 1.0 },
+  { programName: "Degree ABC Scholarship", eth: 1.0 },
+  { programName: "Degree ABC Scholarship", eth: 1.0 },
+  { programName: "Degree ABC Scholarship", eth: 1.0 },
+  { programName: "Degree ABC Scholarship", eth: 1.0 },
+  { programName: "Degree ABC Scholarship", eth: 1.0 },
+  { programName: "Degree ABC Scholarship", eth: 1.0 },
+];
