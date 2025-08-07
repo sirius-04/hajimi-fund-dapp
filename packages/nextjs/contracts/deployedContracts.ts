@@ -5,9 +5,9 @@
 import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
-  31337: {
+  11155111: {
     ScholarshipProgramFactory: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0x06C70Db4D9a6bae1DC9c2cB1B3567Eb0faCeB888",
       abi: [
         {
           anonymous: false,
@@ -38,9 +38,9 @@ const deployedContracts = {
             },
             {
               indexed: false,
-              internalType: "string",
-              name: "mediaCID",
-              type: "string",
+              internalType: "string[]",
+              name: "mediaCIDs",
+              type: "string[]",
             },
             {
               indexed: false,
@@ -76,9 +76,9 @@ const deployedContracts = {
               type: "uint256",
             },
             {
-              internalType: "string",
-              name: "_mediaCID",
-              type: "string",
+              internalType: "string[]",
+              name: "_mediaCIDs",
+              type: "string[]",
             },
           ],
           name: "createProgram",
@@ -182,7 +182,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 1,
+      deployedOnBlock: 8932293,
     },
   },
 } as const;
