@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import GradientText from "./ui/GradientText";
 import { Badge } from "./ui/badge";
-import { Box, Lock, Search, Settings, Sparkles } from "lucide-react";
+import { Separator } from "./ui/separator";
+import { Box, CalendarDays, Lock, Search, Settings, Sparkles } from "lucide-react";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { GlowingEffect } from "~~/components/ui/glowing-effect";
 
@@ -133,14 +134,21 @@ const GridItem = ({ icon, title, description }: GridItemProps) => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold">Contributor:</span>
-                  <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
-                    <BlockieAvatar address="0xfc9400703dA075a14C9Cc4b87726FA90aDc055F2" size={20} />
-                    <BlockieAvatar address="0x2f2F5CC5267BA8A9f6E7D6281DD436ABA6125aE5" size={20} />
-                    <BlockieAvatar address="0xD1080dD3eb453F88988b88a15b3C5c6b72D7f340" size={20} />
-                    <BlockieAvatar address="0x9d67818bE11a5377907103Eb1f6BA75055cE6280" size={20} />
-                    <BlockieAvatar address="0xB7931A7947107a53f48F086D39920Cd9Cee7BA31" size={20} />
+                <div className="flex h-5 items-center space-x-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold">Contributor:</span>
+                    <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+                      <BlockieAvatar address="0xfc9400703dA075a14C9Cc4b87726FA90aDc055F2" size={20} />
+                      <BlockieAvatar address="0x2f2F5CC5267BA8A9f6E7D6281DD436ABA6125aE5" size={20} />
+                      <BlockieAvatar address="0xD1080dD3eb453F88988b88a15b3C5c6b72D7f340" size={20} />
+                      <BlockieAvatar address="0x9d67818bE11a5377907103Eb1f6BA75055cE6280" size={20} />
+                      <BlockieAvatar address="0xB7931A7947107a53f48F086D39920Cd9Cee7BA31" size={20} />
+                    </div>
+                  </div>
+                  <Separator orientation="vertical" />
+                  <div className="flex items-center gap-2">
+                    <CalendarDays size="20" />
+                    <p>Sat, Aug 9 2025</p>
                   </div>
                 </div>
               </div>
