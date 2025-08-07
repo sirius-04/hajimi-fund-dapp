@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT 
+pragma solidity ^0.8.30;
 import "./ScholarshipProgram.sol";
 
 contract ScholarshipProgramFactory {
@@ -10,7 +11,7 @@ contract ScholarshipProgramFactory {
         address indexed creator,
         string title,
         string description,
-        string mediaCID,
+        string[] mediaCIDs,
         uint goal,
         uint timestamp
     );
@@ -19,7 +20,7 @@ contract ScholarshipProgramFactory {
         string memory _title,
         string memory _description,
         uint _goal,
-        string memory _mediaCID
+        string[] memory _mediaCIDs
     ) external returns (address) {
         require(_goal > 0, "Goal must be positive");
         require(bytes(_title).length > 0, "Title required");
@@ -28,7 +29,7 @@ contract ScholarshipProgramFactory {
             _title,
             _description,
             _goal,
-            _mediaCID,
+            _mediaCIDs,
             msg.sender
         );
 
@@ -41,7 +42,7 @@ contract ScholarshipProgramFactory {
             msg.sender,
             _title,
             _description,
-            _mediaCID,
+            _mediaCIDs,
             _goal,
             block.timestamp
         );

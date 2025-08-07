@@ -5,16 +5,32 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 
 contract ScholarshipProgram is ReentrancyGuard, Pausable {
-    enum ProgramStatus { Pending, Active, Expired, Cancelled, Completed }
-    enum RequestStatus { Pending, Approved, Rejected, Expired, Completed }
-    enum Vote { None, Approve, Reject }
+    enum ProgramStatus {
+        Pending,
+        Active,
+        Expired,
+        Cancelled,
+        Completed
+    }
+    enum RequestStatus {
+        Pending,
+        Approved,
+        Rejected,
+        Expired,
+        Completed
+    }
+    enum Vote {
+        None,
+        Approve,
+        Reject
+    }
 
     struct Request {
         uint id;
         string title;
         string description;
         uint value;
-        string evidenceCID;
+        string[] mediaCIDs;
         uint approvalCount;
         uint rejectCount;
         RequestStatus status;
@@ -30,7 +46,7 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
 
     string public title;
     string public description;
-    string public mediaCID;
+    string[] public mediaCIDs;
     address public creator;
     uint public goal;
     ProgramStatus public status;
@@ -50,7 +66,7 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
     mapping(uint => mapping(address => Vote)) public votesByRequest;
     mapping(address => bool) public hasContributed;
     mapping(address => uint) public totalContributions;
-    
+
     address[] public contributors;
     Contribution[] public contributions;
     uint[] public requestIds;
@@ -93,24 +109,24 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
     event ProgramCancelled(uint timestamp, uint refundedAmount);
     event ProgramExpired(uint timestamp);
     event ProgramCompleted(uint timestamp);
-    
+
     event RequestCreated(uint indexed requestId, string title, uint value, uint votingDeadline);
     event VoteCast(uint indexed requestId, address indexed voter, bool approved);
     event RequestApproved(uint indexed requestId, uint timestamp);
     event RequestExpired(uint indexed requestId, uint timestamp);
     event RequestRejected(uint indexed requestId, uint timestamp);
     event RequestCompleted(uint indexed requestId, uint value, uint timestamp);
-    
+
     event FundsReleased(uint indexed requestId, address recipient, uint amount);
     event RefundAvailable(address indexed programAddress);
     event RefundProcessed(address indexed contributor, uint amount);
-    event ProofUploaded(uint indexed requestId, string evidenceCID);
+    event MediaUploaded(uint indexed requestId, string[] mediaCIDs);
 
     constructor(
         string memory _title,
         string memory _description,
         uint _goal,
-        string memory _mediaCID,
+        string[] memory _mediaCIDs,
         address _creator
     ) {
         require(_goal > 0, "Goal must be positive");
@@ -120,7 +136,7 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
         title = _title;
         description = _description;
         goal = _goal;
-        mediaCID = _mediaCID;
+        mediaCIDs = _mediaCIDs;
         creator = _creator;
         status = ProgramStatus.Pending;
         createdAt = block.timestamp;
@@ -140,11 +156,9 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
         totalContributions[msg.sender] += msg.value;
 
         // add contribution
-        contributions.push(Contribution({
-            contributor: msg.sender,
-            contributedAmount: msg.value,
-            timestamp: block.timestamp
-        }));
+        contributions.push(
+            Contribution({ contributor: msg.sender, contributedAmount: msg.value, timestamp: block.timestamp })
+        );
 
         if (!hasContributed[msg.sender]) {
             contributors.push(msg.sender);
@@ -171,7 +185,7 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
         string memory _title,
         string memory _description,
         uint _value,
-        string memory _evidenceCID
+        string[] memory _mediaCID
     ) external onlyCreator programActive nonReentrant {
         require(bytes(_title).length > 0, "Title required");
         require(_value > 0, "Value must be positive");
@@ -179,12 +193,12 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
 
         nextRequestId++;
         Request storage newRequest = requestsMap[nextRequestId];
-        
+
         newRequest.id = nextRequestId;
         newRequest.title = _title;
         newRequest.description = _description;
         newRequest.value = _value;
-        newRequest.evidenceCID = _evidenceCID;
+        newRequest.mediaCIDs = _mediaCID;
         newRequest.status = RequestStatus.Pending;
         newRequest.createdAt = block.timestamp;
         newRequest.votingDeadline = block.timestamp + VOTING_PERIOD;
@@ -195,9 +209,9 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
     }
 
     // vote on request
-    function vote(uint _requestId, bool _approve) external onlyApprover nonReentrant validRequest(_requestId) {
+    function vote(uint _requestId, bool _approve) external validRequest(_requestId) onlyApprover nonReentrant  {
         Request storage request = requestsMap[_requestId];
-        
+
         require(request.status == RequestStatus.Pending, "Request not pending");
         require(!isRequestExpired(_requestId), "Voting period ended");
         require(votesByRequest[_requestId][msg.sender] == Vote.None, "Already voted");
@@ -212,38 +226,61 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
 
         emit VoteCast(_requestId, msg.sender, _approve);
 
-        _checkVotingThreshold(_requestId);
+        uint minApprovalsNeeded = (approversCount * APPROVAL_THRESHOLD + 99) / 100;
+        uint totalVotes = request.approvalCount + request.rejectCount;
+
+        bool shouldFinalize = false;
+
+        // enough approvals
+        if (request.approvalCount >= minApprovalsNeeded) {
+            shouldFinalize = true;
+        }
+        // rejection too much
+        else if (request.rejectCount > approversCount - minApprovalsNeeded) {
+            shouldFinalize = true;
+        }
+        // all voted
+        else if (totalVotes >= approversCount) {
+            shouldFinalize = true;
+        }
+        // deadline
+        else if (block.timestamp >= request.votingDeadline) {
+            shouldFinalize = true;
+        }
+
+        if (shouldFinalize) {
+            _checkVotingThreshold(_requestId);
+        }
     }
 
     // update the request status by checking if it passed the threshold
     function _checkVotingThreshold(uint _requestId) internal {
         Request storage request = requestsMap[_requestId];
-        
+
         if (approversCount == 0) return;
 
         uint totalVotes = request.approvalCount + request.rejectCount;
 
         uint approvalRate = (request.approvalCount * 100) / totalVotes;
-        uint rejectRate = (request.rejectCount * 100) / totalVotes;
 
         if (approvalRate >= APPROVAL_THRESHOLD) {
             request.status = RequestStatus.Approved;
             emit RequestApproved(_requestId, block.timestamp);
-        } else if (rejectRate > (100 - APPROVAL_THRESHOLD)) {
+        } else {
             request.status = RequestStatus.Rejected;
             emit RequestRejected(_requestId, block.timestamp);
         }
     }
 
     // finalize approved request
-    function finalizeRequest(uint _requestId) external onlyCreator nonReentrant validRequest(_requestId) {
+    function finalizeRequest(uint _requestId) external onlyCreator programActive nonReentrant validRequest(_requestId) {
         Request storage request = requestsMap[_requestId];
-        
+
         require(request.status == RequestStatus.Approved, "Request not approved");
         require(address(this).balance >= request.value, "Insufficient funds");
 
         // transfer the fund
-        (bool success, ) = payable(creator).call{value: request.value}("");
+        (bool success, ) = payable(creator).call{ value: request.value }("");
         require(success, "Transfer failed");
 
         request.status = RequestStatus.Completed;
@@ -258,29 +295,23 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
         }
     }
 
-    // upload proof of achievement
-    function uploadProof(uint _requestId, string memory _evidenceCID) external onlyCreator validRequest(_requestId) {
+    // upload media
+    function uploadMedia(uint _requestId, string[] memory _mediaCIDs) external onlyCreator validRequest(_requestId) {
         Request storage request = requestsMap[_requestId];
-        require(request.status == RequestStatus.Completed, "Request not completed");
-        
-        request.evidenceCID = _evidenceCID;
-        emit ProofUploaded(_requestId, _evidenceCID);
+
+        for (uint i=0; i < _mediaCIDs.length; i++) {
+            request.mediaCIDs.push(_mediaCIDs[i]);
+        }
+        emit MediaUploaded(_requestId, _mediaCIDs);
     }
 
     // cancel program
     function cancelProgram() external onlyCreator nonReentrant {
         require(status == ProgramStatus.Pending || status == ProgramStatus.Active, "Cannot cancel program");
-        
-        // if active, ensure no approved request
-        if (status == ProgramStatus.Active) {
-            for (uint i = 0; i < requestIds.length; i++) {
-                require(requestsMap[requestIds[i]].status != RequestStatus.Approved, "Has approved requests");
-            }
-        }
 
         uint refundAmount = address(this).balance;
         _processRefunds();
-        
+
         status = ProgramStatus.Cancelled;
         emit ProgramCancelled(block.timestamp, refundAmount);
     }
@@ -290,17 +321,14 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
     }
 
     function withdrawRefund() external nonReentrant {
-        require(
-            status == ProgramStatus.Cancelled || status == ProgramStatus.Expired,
-            "Refunds not available"
-        );
+        require(status == ProgramStatus.Cancelled || status == ProgramStatus.Expired, "Refunds not available");
 
         uint amount = totalContributions[msg.sender];
         require(amount > 0, "No refund available");
 
         totalContributions[msg.sender] = 0;
 
-        (bool success, ) = payable(msg.sender).call{value: amount}("");
+        (bool success, ) = payable(msg.sender).call{ value: amount }("");
         require(success, "Refund transfer failed");
 
         emit RefundProcessed(msg.sender, amount);
@@ -308,10 +336,12 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
 
     // check and update program n requests expiry status
     function updateStatus() external {
-        if (block.timestamp >= expiryDate && status == ProgramStatus.Pending) {
+        uint currentTime = block.timestamp;
+
+        if (currentTime >= expiryDate && status == ProgramStatus.Pending) {
             _processRefunds();
             status = ProgramStatus.Expired;
-            emit ProgramExpired(block.timestamp);
+            emit ProgramExpired(currentTime);
         }
 
         for (uint i = 0; i < requestIds.length; i++) {
@@ -323,12 +353,14 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
     // check n update request expiry
     function isRequestExpired(uint _requestId) public validRequest(_requestId) returns (bool) {
         Request storage request = requestsMap[_requestId];
-        if (request.status == RequestStatus.Pending && block.timestamp < request.votingDeadline) {
+        uint currentTime = block.timestamp;
+
+        if (request.status == RequestStatus.Pending && request.votingDeadline >= currentTime) {
             return false;
         }
 
         request.status = RequestStatus.Expired;
-        emit RequestExpired(_requestId, block.timestamp);
+        emit RequestExpired(_requestId, currentTime);
         return true;
     }
 
@@ -344,23 +376,24 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
     // getters
     function getRequest(uint _requestId) external view validRequest(_requestId) returns (Request memory) {
         Request storage request = requestsMap[_requestId];
-        return Request({
-            id: request.id,
-            title: request.title,
-            description: request.description,
-            value: request.value,
-            evidenceCID: request.evidenceCID,
-            approvalCount: request.approvalCount,
-            rejectCount: request.rejectCount,
-            status: request.status,
-            createdAt: request.createdAt,
-            votingDeadline: request.votingDeadline
-        });
+        return
+            Request({
+                id: request.id,
+                title: request.title,
+                description: request.description,
+                value: request.value,
+                mediaCIDs: request.mediaCIDs,
+                approvalCount: request.approvalCount,
+                rejectCount: request.rejectCount,
+                status: request.status,
+                createdAt: request.createdAt,
+                votingDeadline: request.votingDeadline
+            });
     }
 
     function getAllRequests() external view returns (Request[] memory) {
         Request[] memory allRequests = new Request[](requestIds.length);
-        
+
         for (uint i = 0; i < requestIds.length; i++) {
             Request storage request = requestsMap[requestIds[i]];
             allRequests[i] = Request({
@@ -368,7 +401,7 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
                 title: request.title,
                 description: request.description,
                 value: request.value,
-                evidenceCID: request.evidenceCID,
+                mediaCIDs: request.mediaCIDs,
                 approvalCount: request.approvalCount,
                 rejectCount: request.rejectCount,
                 status: request.status,
@@ -376,7 +409,7 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
                 votingDeadline: request.votingDeadline
             });
         }
-        
+
         return allRequests;
     }
 
@@ -392,22 +425,26 @@ contract ScholarshipProgram is ReentrancyGuard, Pausable {
         return votesByRequest[_requestId][_voter];
     }
 
-    function getProgramInfo() external view returns (
-        string memory _title,
-        string memory _description,
-        string memory _mediaCID,
-        address _creator,
-        uint _goal,
-        uint _balance,
-        ProgramStatus _status,
-        uint _approversCount,
-        uint _createdAt,
-        uint _expiryDate
-    ) {
+    function getProgramInfo()
+        external
+        view
+        returns (
+            string memory _title,
+            string memory _description,
+            string[] memory _mediaCIDs,
+            address _creator,
+            uint _goal,
+            uint _balance,
+            ProgramStatus _status,
+            uint _approversCount,
+            uint _createdAt,
+            uint _expiryDate
+        )
+    {
         return (
             title,
             description,
-            mediaCID,
+            mediaCIDs,
             creator,
             goal,
             address(this).balance,

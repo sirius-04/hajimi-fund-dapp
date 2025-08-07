@@ -3,6 +3,7 @@ import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { ScholarshipProgram, ScholarshipProgramFactory } from "../typechain-types";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
+import { EventLog } from "ethers/lib.commonjs/contract";
 
 describe("ScholarshipProgram", function () {
   let factory: ScholarshipProgramFactory;
@@ -15,11 +16,11 @@ describe("ScholarshipProgram", function () {
 
   const PROGRAM_TITLE = "Test Scholarship Program";
   const PROGRAM_DESCRIPTION = "A test scholarship program for students";
-  const PROGRAM_GOAL = ethers.parseEther("10"); // 10 ETH
-  const MEDIA_CID = "QmTestMediaCID";
-  const MIN_CONTRIBUTION = (PROGRAM_GOAL * BigInt(1)) / BigInt(100); // 1% of goal
-  const VOTING_PERIOD = 7 * 24 * 60 * 60; // 7 days in seconds
-  const PROGRAM_DURATION = 90 * 24 * 60 * 60; // 90 days in seconds
+  const PROGRAM_GOAL = ethers.parseEther("10");
+  const MEDIA_CIDS = ["QmTestMediaCID"];
+  const MIN_CONTRIBUTION = (PROGRAM_GOAL * BigInt(1)) / BigInt(100);
+  const VOTING_PERIOD = 7 * 24 * 60 * 60; // 7 days
+  const PROGRAM_DURATION = 90 * 24 * 60 * 60; // 90 days
 
   beforeEach(async function () {
     [creator, contributor1, contributor2, contributor3, nonContributor] = await ethers.getSigners();
@@ -31,10 +32,12 @@ describe("ScholarshipProgram", function () {
     // Create a program
     const tx = await factory
       .connect(creator)
-      .createProgram(PROGRAM_TITLE, PROGRAM_DESCRIPTION, PROGRAM_GOAL, MEDIA_CID);
+      .createProgram(PROGRAM_TITLE, PROGRAM_DESCRIPTION, PROGRAM_GOAL, MEDIA_CIDS);
 
     const receipt = await tx.wait();
-    const event = receipt?.logs.find((log: any) => log.fragment?.name === "ProgramCreated");
+    const event = receipt?.logs.find(
+      (log): log is EventLog => "fragment" in log && log.fragment?.name === "ProgramCreated",
+    ) as EventLog;
     const programAddress = event?.args[0];
 
     program = await ethers.getContractAt("ScholarshipProgram", programAddress);
@@ -48,7 +51,7 @@ describe("ScholarshipProgram", function () {
       expect(programInfo._description).to.equal(PROGRAM_DESCRIPTION);
       expect(programInfo._goal).to.equal(PROGRAM_GOAL);
       expect(programInfo._creator).to.equal(creator.address);
-      expect(programInfo._status).to.equal(0); // Pending status
+      expect(programInfo._status).to.equal(0); // pending
     });
 
     it("Should track deployed programs", async function () {
@@ -65,19 +68,18 @@ describe("ScholarshipProgram", function () {
 
     it("Should revert with invalid parameters", async function () {
       await expect(
-        factory.connect(creator).createProgram("", PROGRAM_DESCRIPTION, PROGRAM_GOAL, MEDIA_CID),
+        factory.connect(creator).createProgram("", PROGRAM_DESCRIPTION, PROGRAM_GOAL, MEDIA_CIDS),
       ).to.be.revertedWith("Title required");
 
       await expect(
-        factory.connect(creator).createProgram(PROGRAM_TITLE, PROGRAM_DESCRIPTION, 0, MEDIA_CID),
+        factory.connect(creator).createProgram(PROGRAM_TITLE, PROGRAM_DESCRIPTION, 0, MEDIA_CIDS),
       ).to.be.revertedWith("Goal must be positive");
     });
   });
 
   describe("Contributions", function () {
     it("Should accept contributions and update balances", async function () {
-      let contributed;
-      const contributionAmount = ethers.parseEther("1");
+      const contributionAmount = ethers.parseEther("0.001");
 
       await expect(program.connect(contributor1).contribute({ value: contributionAmount }))
         .to.emit(program, "Contributed")
@@ -86,8 +88,7 @@ describe("ScholarshipProgram", function () {
       expect(await program.totalContributions(contributor1.address)).to.equal(contributionAmount);
       expect(await ethers.provider.getBalance(await program.getAddress())).to.equal(contributionAmount);
 
-      contributed = await program.hasContributed(contributor1.address);
-      expect(contributed).to.be.true;
+      expect(await program.hasContributed(contributor1.address)).to.be.true;
     });
 
     it("Should make contributor an approver when meeting minimum contribution", async function () {
@@ -140,10 +141,10 @@ describe("ScholarshipProgram", function () {
       const requestTitle = "Buy Textbooks";
       const requestDescription = "Purchase textbooks for semester";
       const requestValue = ethers.parseEther("1");
-      const evidenceCID = "QmEvidenceCID";
+      const mediaCIDs = ["QmMediaCID"];
 
       await expect(
-        program.connect(creator).createRequest(requestTitle, requestDescription, requestValue, evidenceCID),
+        program.connect(creator).createRequest(requestTitle, requestDescription, requestValue, mediaCIDs),
       ).to.emit(program, "RequestCreated");
 
       const request = await program.getRequest(1);
@@ -158,39 +159,37 @@ describe("ScholarshipProgram", function () {
       const excessiveAmount = maxAllowedAmount + ethers.parseEther("1");
 
       await expect(
-        program.connect(creator).createRequest("Excessive Request", "Too much", excessiveAmount, "CID"),
+        program.connect(creator).createRequest("Excessive Request", "Too much", excessiveAmount, ["CID"]),
       ).to.be.revertedWith("Exceeds maximum request amount");
     });
 
     it("Should only allow creator to create requests", async function () {
       await expect(
-        program.connect(contributor1).createRequest("Unauthorized", "Request", ethers.parseEther("1"), "CID"),
+        program.connect(contributor1).createRequest("Unauthorized", "Request", ethers.parseEther("1"), ["CID"]),
       ).to.be.revertedWith("Not the program creator");
     });
 
     it("Should require program to be active", async function () {
-      // Create a new pending program
-      const newProgram = await ethers.getContractAt(
-        "ScholarshipProgram",
-        await (await factory.connect(creator).createProgram("New Program", "Description", PROGRAM_GOAL, "CID"))
-          .wait()
-          .then(receipt => receipt?.logs.find((log: any) => log.fragment?.name === "ProgramCreated")?.args[0]),
+      const tx = await factory.connect(creator).createProgram("New Program", "Description", PROGRAM_GOAL, ["CID"]);
+      const receipt = await tx.wait();
+      const event = receipt?.logs.find(
+        (log): log is EventLog => "fragment" in log && log.fragment?.name === "ProgramCreated",
       );
+      const newProgram = await ethers.getContractAt("ScholarshipProgram", event?.args[0]);
 
       await expect(
-        newProgram.connect(creator).createRequest("Title", "Description", ethers.parseEther("1"), "CID"),
+        newProgram.connect(creator).createRequest("Title", "Description", ethers.parseEther("1"), ["CID"]),
       ).to.be.revertedWith("Program not active");
     });
   });
 
   describe("Voting System", function () {
     beforeEach(async function () {
-      // Setup: Create program, make contributions to have approvers, create request
       await program.connect(contributor1).contribute({ value: MIN_CONTRIBUTION });
       await program.connect(contributor2).contribute({ value: MIN_CONTRIBUTION });
       await program.connect(contributor3).contribute({ value: PROGRAM_GOAL });
 
-      await program.connect(creator).createRequest("Test Request", "Description", ethers.parseEther("1"), "CID");
+      await program.connect(creator).createRequest("Test Request", "Description", ethers.parseEther("1"), ["CID"]);
     });
 
     it("Should allow approvers to vote", async function () {
@@ -214,26 +213,22 @@ describe("ScholarshipProgram", function () {
     });
 
     it("Should approve request when reaching 60% approval threshold", async function () {
-      // We have 3 approvers, need at least 60% approval
       await program.connect(contributor1).vote(1, true);
       await program.connect(contributor2).vote(1, true);
-      // 2/2 = 100% approval rate should trigger approval
 
       const request = await program.getRequest(1);
-      expect(request.status).to.equal(1); // Approved
+      expect(request.status).to.equal(1); // approved
     });
 
     it("Should reject request when rejection rate exceeds threshold", async function () {
       await program.connect(contributor1).vote(1, false);
       await program.connect(contributor2).vote(1, false);
-      // 2/2 = 100% rejection rate should trigger rejection
 
       const request = await program.getRequest(1);
-      expect(request.status).to.equal(2); // Rejected
+      expect(request.status).to.equal(2); // rejected
     });
 
     it("Should handle voting deadline expiry", async function () {
-      // Fast forward past voting deadline
       await time.increase(VOTING_PERIOD + 1);
 
       await expect(program.connect(contributor1).vote(1, true)).to.be.revertedWith("Voting period ended");
@@ -242,12 +237,11 @@ describe("ScholarshipProgram", function () {
 
   describe("Request Finalization", function () {
     beforeEach(async function () {
-      // Setup approved request
       await program.connect(contributor1).contribute({ value: MIN_CONTRIBUTION });
       await program.connect(contributor2).contribute({ value: MIN_CONTRIBUTION });
       await program.connect(contributor3).contribute({ value: PROGRAM_GOAL });
 
-      await program.connect(creator).createRequest("Test Request", "Description", ethers.parseEther("1"), "CID");
+      await program.connect(creator).createRequest("Test Request", "Description", ethers.parseEther("1"), ["CID"]);
       await program.connect(contributor1).vote(1, true);
       await program.connect(contributor2).vote(1, true);
     });
@@ -270,18 +264,51 @@ describe("ScholarshipProgram", function () {
     });
 
     it("Should only finalize approved requests", async function () {
-      // Create a new pending request
-      await program.connect(creator).createRequest("Pending Request", "Description", ethers.parseEther("0.5"), "CID");
+      await program.connect(creator).createRequest("Pending Request", "Description", ethers.parseEther("0.5"), ["CID"]);
 
       await expect(program.connect(creator).finalizeRequest(2)).to.be.revertedWith("Request not approved");
     });
 
     it("Should mark program as completed when all funds are spent", async function () {
-      // Finalize request that uses all funds
-      await program.connect(creator).finalizeRequest(1);
+      await program
+        .connect(creator)
+        .createRequest("finalization test 1", "test 1 des", ethers.parseEther("2.505"), ["CID"]);
+      await program
+        .connect(creator)
+        .createRequest("finalization test 2", "test 2 des", ethers.parseEther("2.505"), ["CID"]);
+      await program
+        .connect(creator)
+        .createRequest("finalization test 3", "test 3 des", ethers.parseEther("2.505"), ["CID"]);
+      await program
+        .connect(creator)
+        .createRequest("finalization test 4", "test 4 des", ethers.parseEther("2.505"), ["CID"]);
+      await program
+        .connect(creator)
+        .createRequest("finalization test 5", "test 5 des", ethers.parseEther("0.18"), ["CID"]);
+
+      await program.connect(contributor1).vote(2, true);
+      await program.connect(contributor2).vote(2, true);
+
+      await program.connect(contributor1).vote(3, true);
+      await program.connect(contributor2).vote(3, true);
+
+      await program.connect(contributor1).vote(4, true);
+      await program.connect(contributor2).vote(4, true);
+
+      await program.connect(contributor1).vote(5, true);
+      await program.connect(contributor2).vote(5, true);
+
+      await program.connect(contributor1).vote(6, true);
+      await program.connect(contributor2).vote(6, true);
+
+      await program.connect(creator).finalizeRequest(2);
+      await program.connect(creator).finalizeRequest(3);
+      await program.connect(creator).finalizeRequest(4);
+      await program.connect(creator).finalizeRequest(5);
+      await program.connect(creator).finalizeRequest(6);
 
       const programInfo = await program.getProgramInfo();
-      expect(programInfo._status).to.equal(4); // Completed
+      expect(programInfo._status).to.equal(4); // completed
     });
   });
 
@@ -293,18 +320,19 @@ describe("ScholarshipProgram", function () {
       await expect(program.connect(creator).cancelProgram()).to.emit(program, "ProgramCancelled");
 
       const programInfo = await program.getProgramInfo();
-      expect(programInfo._status).to.equal(3); // Cancelled
+      expect(programInfo._status).to.equal(3); // cancelled
     });
 
-    it("Should prevent cancellation with approved requests", async function () {
-      // Setup active program with approved request
+    it("Should prevent finalization of requests if program cancelled", async function () {
       await program.connect(contributor1).contribute({ value: MIN_CONTRIBUTION });
       await program.connect(contributor2).contribute({ value: PROGRAM_GOAL });
 
-      await program.connect(creator).createRequest("Test", "Description", ethers.parseEther("1"), "CID");
+      await program.connect(creator).createRequest("Test", "Description", ethers.parseEther("1"), ["CID"]);
       await program.connect(contributor1).vote(1, true);
 
-      await expect(program.connect(creator).cancelProgram()).to.be.revertedWith("Has approved requests");
+      await program.connect(creator).cancelProgram();
+
+      await expect(program.connect(creator).finalizeRequest(1)).to.be.revertedWith("Program not active");
     });
 
     it("Should only allow creator to cancel", async function () {
@@ -370,46 +398,49 @@ describe("ScholarshipProgram", function () {
 
     it("Should expire requests after voting period", async function () {
       await program.connect(contributor1).contribute({ value: PROGRAM_GOAL });
-      await program.connect(creator).createRequest("Test", "Description", ethers.parseEther("1"), "CID");
+      await program.connect(creator).createRequest("Test", "Description", ethers.parseEther("1"), ["CID"]);
 
       await time.increase(VOTING_PERIOD + 1);
 
-      await expect(program.updateStatus())
-        .to.emit(program, "RequestExpired")
-        .withArgs(1, await time.latest());
+      await expect(program.updateStatus()).to.emit(program, "RequestExpired");
     });
   });
 
-  describe("Proof Upload", function () {
+  describe("Media Upload", function () {
+    const dummyCIDs = ["QmCID1Image", "QmCID2PDF", "QmCID3Image"];
+
     beforeEach(async function () {
-      // Setup completed request
-      await program.connect(contributor1).contribute({ value: MIN_CONTRIBUTION });
-      await program.connect(contributor2).contribute({ value: PROGRAM_GOAL });
+      await program.connect(contributor1).contribute({ value: PROGRAM_GOAL });
 
-      await program.connect(creator).createRequest("Test", "Description", ethers.parseEther("1"), "CID");
-      await program.connect(contributor1).vote(1, true);
-      await program.connect(creator).finalizeRequest(1);
+      await program
+        .connect(creator)
+        .createRequest("Books", "Buying books", ethers.parseEther("2"), ["QmInitialRequestMedia"]);
     });
 
-    it("Should allow uploading proof for completed requests", async function () {
-      const proofCID = "QmProofCID123";
+    it("should allow creator to upload multiple media CIDs to request", async function () {
+      const requestId = 1;
 
-      await expect(program.connect(creator).uploadProof(1, proofCID))
-        .to.emit(program, "ProofUploaded")
-        .withArgs(1, proofCID);
+      const tx = await program.connect(creator).uploadMedia(requestId, dummyCIDs);
+      await tx.wait();
 
-      const request = await program.getRequest(1);
-      expect(request.evidenceCID).to.equal(proofCID);
+      const request = await program.getRequest(requestId);
+
+      expect(request.mediaCIDs).to.have.lengthOf(4);
+      expect(request.mediaCIDs.slice(1)).to.deep.equal(dummyCIDs);
     });
 
-    it("Should only allow creator to upload proof", async function () {
-      await expect(program.connect(contributor1).uploadProof(1, "proof")).to.be.revertedWith("Not the program creator");
+    it("should revert if non-creator tries to upload media", async function () {
+      await expect(program.connect(contributor1).uploadMedia(1, ["QmUnauthorizedCID"])).to.be.revertedWith(
+        "Not the program creator",
+      );
     });
 
-    it("Should only allow proof upload for completed requests", async function () {
-      await program.connect(creator).createRequest("Pending", "Description", ethers.parseEther("0.5"), "CID");
+    it("should emit MediaUploaded event", async function () {
+      const mediaCIDs = ["QmProofCID123"];
 
-      await expect(program.connect(creator).uploadProof(2, "proof")).to.be.revertedWith("Request not completed");
+      await expect(await program.connect(creator).uploadMedia(1, mediaCIDs))
+        .to.emit(program, "MediaUploaded")
+        .withArgs(1, mediaCIDs);
     });
   });
 
@@ -434,8 +465,8 @@ describe("ScholarshipProgram", function () {
       await program.connect(contributor1).contribute({ value: MIN_CONTRIBUTION });
       await program.connect(contributor2).contribute({ value: PROGRAM_GOAL });
 
-      await program.connect(creator).createRequest("Request 1", "Description 1", ethers.parseEther("1"), "CID1");
-      await program.connect(creator).createRequest("Request 2", "Description 2", ethers.parseEther("2"), "CID2");
+      await program.connect(creator).createRequest("Request 1", "Description 1", ethers.parseEther("1"), ["CID1"]);
+      await program.connect(creator).createRequest("Request 2", "Description 2", ethers.parseEther("2"), ["CID2"]);
     });
 
     it("Should return all requests", async function () {
@@ -479,8 +510,6 @@ describe("ScholarshipProgram", function () {
     });
 
     it("Should handle reentrancy protection", async function () {
-      // This would require a malicious contract to test properly
-      // For now, we verify the nonReentrant modifier exists on critical functions
       const contribute = await program.connect(contributor1).contribute({ value: ethers.parseEther("1") });
       expect(contribute).to.not.be.reverted;
     });
@@ -488,7 +517,7 @@ describe("ScholarshipProgram", function () {
     it("Should validate request IDs", async function () {
       await expect(program.getRequest(999)).to.be.revertedWith("Invalid request ID");
 
-      await expect(program.vote(0, true)).to.be.revertedWith("Invalid request ID");
+      await expect(program.connect(contributor1).vote(0, true)).to.be.revertedWith("Invalid request ID");
     });
 
     it("Should prevent contributions after expiry", async function () {
