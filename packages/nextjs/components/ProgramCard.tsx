@@ -9,61 +9,51 @@ import { Separator } from "./ui/separator";
 import { Box, CalendarDays, Lock, Search, Settings, Sparkles } from "lucide-react";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { GlowingEffect } from "~~/components/ui/glowing-effect";
+import { truncateText } from "~~/func/turncateText";
 
-export function ProgramCard() {
+interface GridItemProps {
+  id: string;
+  title: string;
+  description: string;
+  badgeText?: string;
+  contributors?: string[];
+  date?: string;
+  price?: string;
+}
+
+interface ProgramCardProps {
+  data: GridItemProps[];
+}
+
+export function ProgramCard({ data }: ProgramCardProps) {
   return (
-    <ul className="flex flex-col gap-3">
-      <GridItem
-        icon={<Box className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="Do things the right way"
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-      />
-      <GridItem
-        icon={<Settings className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="The best AI code editor ever."
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-      />
-      <GridItem
-        icon={<Lock className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="You should buy Aceternity UI Pro"
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-      />
-      <GridItem
-        icon={<Sparkles className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="This card is also built by Cursor"
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-      />
-      <GridItem
-        icon={<Search className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="Coming soon on Aceternity UI"
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-      />
-      <GridItem
-        icon={<Search className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="Coming soon on Aceternity UI"
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-      />
-      <GridItem
-        icon={<Search className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="Coming soon on Aceternity UI"
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-      />
-      <GridItem
-        icon={<Search className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="Coming soon on Aceternity UI"
-        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-      />
+    <ul className="flex flex-col gap-3 w-full">
+      {data.map((item, index) => (
+        <GridItem key={index} {...item} />
+      ))}
     </ul>
   );
 }
 
 interface GridItemProps {
-  icon: React.ReactNode;
+  id: string;
   title: string;
-  description: React.ReactNode;
+  description: string;
+  badgeText?: string;
+  contributors?: string[]; // Ethereum addresses
+  date?: string;
+  price?: string;
 }
 
-const GridItem = ({ icon, title, description }: GridItemProps) => {
+export const GridItem = ({
+  id,
+  title,
+  description,
+  badgeText = "In progress",
+  contributors = [],
+  date = "Sat, Aug 9 2025",
+  price = "1.00",
+}: GridItemProps) => {
   const [maxDescLength, setMaxDescLength] = useState(300);
 
   useEffect(() => {
@@ -76,15 +66,12 @@ const GridItem = ({ icon, title, description }: GridItemProps) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Ensure description is a string and truncate if needed
-  const finalDescription = typeof description === "string" ? description : "";
-  const truncatedDescription =
-    finalDescription.length > maxDescLength ? `${finalDescription.slice(0, maxDescLength)}...` : finalDescription;
+  const truncatedDescription = truncateText(description, maxDescLength);
 
   return (
-    <Link href="/program">
+    <Link href={`/program/${id}`} className="w-full">
       <li className="list-none">
-        <div className="relative h-full rounded-xl border p-2 md:rounded-3xl md:p-3 dark:bg-neutral-900 dark:hover:bg-[#1d1d1f] hover:bg-neutral-100 cursor-pointer">
+        <div className="relative h-full rounded-xl border p-2 md:rounded-3xl md:p-3 bg-neutral-50 dark:bg-neutral-900 dark:hover:bg-[#1d1d1f] hover:bg-neutral-100 cursor-pointer transition-all duration-300 hover:scale-[1.02] ">
           <GlowingEffect spread={40} glow={true} disabled={false} proximity={64} inactiveZone={0.01} />
           <div className="border-0.75 relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl p-2 md:p-2 ]">
             {/* Contain start here */}
@@ -96,26 +83,29 @@ const GridItem = ({ icon, title, description }: GridItemProps) => {
 
               {/* Center: Text */}
               <div className="flex-1 pl-4">
-                <div className="flex justify-between  items-center ">
+                <div className="flex justify-between items-center ">
                   <h2 className="font-bold text-lg md:text-xl mb-1">{title}</h2>
-                  <Badge className="h-6 bg-violet-500 text-white ">In progress</Badge>
+                  <Badge className="h-6 bg-violet-500 text-white ">{badgeText}</Badge>
                 </div>
 
                 <div className="flex justify-between items-center gap-2">
-                  <p className="text-muted-foreground text-sm mb-2 max-w-[100%] md:max-w-[80%] w-full">
+                  <p className="text-muted-foreground text-sm mb-2 max-w-[100%] md:max-w-[75%] w-full">
                     {truncatedDescription}
                   </p>
 
-                  <div className="hidden md:flex items-center gap-1">
+                  <div className="hidden md:flex flex-col items-center ">
                     <GradientText
                       colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
                       animationSpeed={5}
                       showBorder={false}
-                      className="text-5xl"
+                      className="text-4xl"
                     >
-                      1.00
+                      {price}
                     </GradientText>
-                    <Image src="/eth.png" alt="Ethereum Logo" width={35} height={35} />
+                    <div className="flex gap-1">
+                      <Image src="/eth.png" alt="Ethereum Logo" width={15} height={15} />
+                      ETH
+                    </div>
                   </div>
                 </div>
 
@@ -128,7 +118,7 @@ const GridItem = ({ icon, title, description }: GridItemProps) => {
                       showBorder={false}
                       className="text-5xl"
                     >
-                      1.00
+                      {price}
                     </GradientText>
                     <Image src="/eth.png" alt="Ethereum Logo" width={35} height={35} className="ml-0" />
                   </div>
@@ -138,17 +128,15 @@ const GridItem = ({ icon, title, description }: GridItemProps) => {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold">Contributor:</span>
                     <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
-                      <BlockieAvatar address="0xfc9400703dA075a14C9Cc4b87726FA90aDc055F2" size={20} />
-                      <BlockieAvatar address="0x2f2F5CC5267BA8A9f6E7D6281DD436ABA6125aE5" size={20} />
-                      <BlockieAvatar address="0xD1080dD3eb453F88988b88a15b3C5c6b72D7f340" size={20} />
-                      <BlockieAvatar address="0x9d67818bE11a5377907103Eb1f6BA75055cE6280" size={20} />
-                      <BlockieAvatar address="0xB7931A7947107a53f48F086D39920Cd9Cee7BA31" size={20} />
+                      {contributors.map((addr, idx) => (
+                        <BlockieAvatar key={idx} address={addr} size={20} />
+                      ))}
                     </div>
                   </div>
                   <Separator orientation="vertical" />
                   <div className="flex items-center gap-2">
                     <CalendarDays size="20" />
-                    <p>Sat, Aug 9 2025</p>
+                    <p>{date}</p>
                   </div>
                 </div>
               </div>

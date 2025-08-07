@@ -20,6 +20,7 @@ import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { Button } from "~~/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "~~/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~~/components/ui/tabs";
+import { programList } from "~~/data/dummy1";
 
 const Home: NextPage = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -66,7 +67,7 @@ const Home: NextPage = () => {
 
             {/* ----- Main content -----  */}
             <div className="h-full w-full mt-3">
-              <ProgramCard />
+              <ProgramCard data={programList} />
             </div>
           </div>
         </motion.div>
