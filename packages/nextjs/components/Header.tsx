@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SwitchTheme } from "./SwitchTheme";
+import { Compass, Ticket } from "lucide-react";
 import { hardhat } from "viem/chains";
 import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
@@ -25,13 +26,14 @@ type HeaderMenuLink = {
 
 export const menuLinks: HeaderMenuLink[] = [
   {
-    label: "Home",
+    label: "Discover",
     href: "/",
+    icon: <Compass className="h-4 w-4" />,
   },
   {
-    label: "Debug Contracts",
-    href: "/debug",
-    icon: <BugAntIcon className="h-4 w-4" />,
+    label: "Programs",
+    href: "/userPrograms",
+    icon: <Ticket className="h-4 w-4" />,
   },
 ];
 
@@ -46,7 +48,7 @@ export const HeaderMenuLinks = ({ onClick }: { onClick?: () => void }) => {
           <Link key={href} href={href} onClick={onClick}>
             <div
               className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-colors ${
-                isActive ? "bg-secondary text-white shadow" : "hover:bg-muted"
+                isActive ? "bg-secondary" : "hover:bg-muted"
               }`}
             >
               {icon}
@@ -67,14 +69,14 @@ export const Header = () => {
     <header className="fixed top-0 z-20 w-full bg-background border dark:border-b-neutral-800 border-b-neutral-200 p-3 md:px-6 md:py-3 flex items-center justify-between ">
       <div className="flex items-center gap-4 container ">
         {/* Mobile menu */}
-        {/* <div className="lg:hidden">
+        <div className="lg:hidden">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <Bars3Icon className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
+            <DropdownMenuContent align="start" className="w-48 dark:bg-neutral-900">
               {menuLinks.map(({ label, href, icon }) => (
                 <DropdownMenuItem asChild key={href}>
                   <Link href={href} className="flex items-center gap-2">
@@ -85,7 +87,7 @@ export const Header = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-        </div> */}
+        </div>
 
         {/* Logo + Brand */}
         <Link href="/" className=" flex items-center gap-2">
@@ -99,13 +101,13 @@ export const Header = () => {
         </Link>
 
         {/* Desktop nav */}
-        {/* <nav className="hidden lg:flex items-center gap-4">
+        <nav className="hidden lg:flex items-center gap-4">
           <HeaderMenuLinks />
-        </nav> */}
+        </nav>
       </div>
 
       {/* Right actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-end gap-2 w-full">
         <RainbowKitCustomConnectButton />
         <SwitchTheme />
         {/* {isLocalNetwork && <FaucetButton />} */}
