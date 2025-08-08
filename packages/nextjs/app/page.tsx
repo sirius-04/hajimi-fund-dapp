@@ -45,7 +45,7 @@ const Home: NextPage = () => {
         >
           <div className="flex flex-col gap-2 px-3 py-2 md:p-5">
             {/* ----- filter buttons ----- */}
-            <div className="flex  justify-between overflow-x-scroll">
+            <div className="flex justify-between">
               <div className="flex gap-2">
                 <Button variant="outline" size="lg" className="cursor-pointer">
                   All
@@ -111,7 +111,7 @@ const Home: NextPage = () => {
                       {tableDate.map((data, index) => (
                         <TableRow key={index} className="hover:underline h-16">
                           <TableCell className="font-medium">
-                            <Link href="/program" className="block w-full h-full">
+                            <Link href={`/program/${data.id}`} className="block w-full h-full" key={index}>
                               <div className="flex gap-2 items-center">
                                 <BlockieAvatar address="0xfc9400703dA075a14C9Cc4b87726FA90aDc055F2" size={25} />
                                 <p>{data.programName}</p>
@@ -119,7 +119,7 @@ const Home: NextPage = () => {
                             </Link>
                           </TableCell>
                           <TableCell className="text-right">
-                            <Link href="/program" className="block w-full h-full">
+                            <Link href={`/program/${data.id}`} className="block w-full h-full" key={index}>
                               <div className="flex gap-2 items-center justify-end">
                                 <p>{data.eth}</p>
                                 <div className="text-violet-400">
@@ -157,11 +157,11 @@ const actionButtons = [
 ];
 
 const tableDate = [
-  { programName: "Degree ABC Scholarship", eth: 1.0 },
-  { programName: "Degree ABC Scholarship", eth: 1.0 },
-  { programName: "Degree ABC Scholarship", eth: 1.0 },
-  { programName: "Degree ABC Scholarship", eth: 1.0 },
-  { programName: "Degree ABC Scholarship", eth: 1.0 },
-  { programName: "Degree ABC Scholarship", eth: 1.0 },
-  { programName: "Degree ABC Scholarship", eth: 1.0 },
+  { programName: "Degree ABC Scholarship", eth: 1.0, id: 1 },
+  { programName: "Degree ABC Scholarship", eth: 1.0, id: 2 },
+  { programName: "Degree ABC Scholarship", eth: 1.0, id: 3 },
+  { programName: "Degree ABC Scholarship", eth: 1.0, id: 4 },
+  { programName: "Degree ABC Scholarship", eth: 1.0, id: 5 },
+  { programName: "Degree ABC Scholarship", eth: 1.0, id: 6 },
+  { programName: "Degree ABC Scholarship", eth: 1.0, id: 7 },
 ];
