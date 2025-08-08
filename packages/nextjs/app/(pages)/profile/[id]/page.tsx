@@ -1,5 +1,7 @@
 import { Angry, Annoyed, Frown, Laugh, Meh, PencilRuler, Smile } from "lucide-react";
 import { getAddress } from "viem";
+import EventCard from "~~/components/EventCard";
+import ProgramNotFound from "~~/components/ProgramNotFound";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import GlassIcons from "~~/components/ui/GlassIcons";
 import { Badge } from "~~/components/ui/badge";
@@ -20,6 +22,8 @@ import { cn } from "~~/lib/utils";
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
   const checkSumAddress = getAddress(id);
+  const list1 = true;
+  const list2 = false;
 
   return (
     <>
@@ -73,127 +77,143 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
             {/* ------ Rewards ------ */}
             <div className="mb-7">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-lg">Rewards</p>
+                <p className="text-lg font-bold">Achievements</p>
 
                 {/* open sheet here */}
                 <Sheet>
                   <SheetTrigger asChild>
-                    <p className="text-md cursor-pointer text-muted-foreground">View All</p>
+                    <p className="text-md cursor-pointer text-muted-foreground hover:underline">View All</p>
                   </SheetTrigger>
                   <SheetContent>
                     <SheetHeader>
-                      <SheetTitle>Edit profile</SheetTitle>
-                      <SheetDescription>
-                        Make changes to your profile here. Click save when you&apos;re done.
-                      </SheetDescription>
+                      <SheetTitle className="text-2xl font-bold">Programs</SheetTitle>
+                      <Separator className="my-2" />
                     </SheetHeader>
-                    <div className="grid flex-1 auto-rows-min gap-6 px-4">
-                      <div className="grid gap-3">
-                        <p>Rewards</p>
-                        <p>Rewards</p>
-                      </div>
-                      <div className="grid gap-3">
-                        <p>Rewards</p>
-                        <p>Rewards</p>
-                      </div>
+                    <div className="px-4 overflow-y-scroll">
+                      {events.map((event, index) => (
+                        <EventCard
+                          key={index}
+                          date={event.date}
+                          description={event.description}
+                          eth={event.eth}
+                          title={event.title}
+                          size="small"
+                        />
+                      ))}
                     </div>
-                    <SheetFooter>
-                      <Button type="submit">Save changes</Button>
-                      <SheetClose asChild>
-                        <Button variant="outline">Close</Button>
-                      </SheetClose>
-                    </SheetFooter>
                   </SheetContent>
                 </Sheet>
               </div>
 
-              <div className=" border-2 rounded-xl h-[200px] p-4 relative">
-                <GlassIcons items={items} className="custom-class" />
+              <div className="flex justify-between w-full items-center border-2 rounded-xl h-[200px] px-10 relative gap-4">
+                {items.map((item, index) => (
+                  <div className="flex flex-col items-center space-y-4" key={index}>
+                    <GlassIcons color={item.color} image={item.image} key={index} />
+                    <p>{item.label}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <Separator className="my-10" />
+            <Separator className="my-10 max-w-3xl mx-auto" />
 
             {/* ------ Past Events ------ */}
-            <div className="mb-7">
+            <div className="mb-7 max-w-3xl mx-auto">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-lg">Past Programs</p>
+                <p className="text-lg font-bold">Past Programs</p>
 
                 {/* open sheet here */}
                 <Sheet>
                   <SheetTrigger asChild>
-                    <p className="text-md cursor-pointer text-muted-foreground">View All</p>
+                    {list1 && <p className="text-md cursor-pointer text-muted-foreground hover:underline">View All</p>}
                   </SheetTrigger>
                   <SheetContent>
                     <SheetHeader>
-                      <SheetTitle>Edit profile</SheetTitle>
-                      <SheetDescription>
-                        Make changes to your profile here. Click save when you&apos;re done.
-                      </SheetDescription>
+                      <SheetTitle className="text-2xl font-bold">Programs</SheetTitle>
+                      <Separator className="my-2" />
                     </SheetHeader>
-                    <div className="grid flex-1 auto-rows-min gap-6 px-4">
-                      <div className="grid gap-3">
-                        <p>Rewards</p>
-                        <p>Rewards</p>
-                      </div>
-                      <div className="grid gap-3">
-                        <p>Rewards</p>
-                        <p>Rewards</p>
-                      </div>
+                    <div className="px-4 overflow-y-scroll">
+                      {events.map((event, index) => (
+                        <EventCard
+                          key={index}
+                          date={event.date}
+                          description={event.description}
+                          eth={event.eth}
+                          title={event.title}
+                          size="small"
+                        />
+                      ))}
                     </div>
-                    <SheetFooter>
-                      <Button type="submit">Save changes</Button>
-                      <SheetClose asChild>
-                        <Button variant="outline">Close</Button>
-                      </SheetClose>
-                    </SheetFooter>
                   </SheetContent>
                 </Sheet>
               </div>
 
-              <div className="bg-neutral-400 border h-[200px] p-3">hi</div>
+              {list1 ? (
+                <div className="">
+                  {events.map((event, index) => (
+                    <EventCard
+                      key={index}
+                      date={event.date}
+                      description={event.description}
+                      eth={event.eth}
+                      title={event.title}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <ProgramNotFound />
+              )}
             </div>
 
-            <Separator className="my-10" />
+            <Separator className="my-10 max-w-3xl mx-auto" />
 
             {/* ------ Contributions ------ */}
-            <div>
+            <div className="max-w-3xl mx-auto">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-lg">Contributions</p>
+                <p className="text-lg font-bold">Contributions</p>
 
                 {/* open sheet here */}
                 <Sheet>
                   <SheetTrigger asChild>
-                    <p className="text-md cursor-pointer text-muted-foreground">View All</p>
+                    {list2 && <p className="text-md cursor-pointer text-muted-foreground hover:underline">View All</p>}
                   </SheetTrigger>
                   <SheetContent>
                     <SheetHeader>
-                      <SheetTitle>Edit profile</SheetTitle>
-                      <SheetDescription>
-                        Make changes to your profile here. Click save when you&apos;re done.
-                      </SheetDescription>
+                      <SheetTitle className="text-2xl font-bold">Contributions</SheetTitle>
+                      <Separator className="my-2" />
                     </SheetHeader>
-                    <div className="grid flex-1 auto-rows-min gap-6 px-4">
-                      <div className="grid gap-3">
-                        <p>Rewards</p>
-                        <p>Rewards</p>
-                      </div>
-                      <div className="grid gap-3">
-                        <p>Rewards</p>
-                        <p>Rewards</p>
-                      </div>
+                    <div className="px-4 overflow-y-scroll">
+                      {events.map((event, index) => (
+                        <EventCard
+                          key={index}
+                          date={event.date}
+                          description={event.description}
+                          eth={event.eth}
+                          title={event.title}
+                          size="small"
+                        />
+                      ))}
                     </div>
-                    <SheetFooter>
-                      <Button type="submit">Save changes</Button>
-                      <SheetClose asChild>
-                        <Button variant="outline">Close</Button>
-                      </SheetClose>
-                    </SheetFooter>
                   </SheetContent>
                 </Sheet>
               </div>
 
-              <div className="h-[200px] p-3 ">hi</div>
+              {list2 ? (
+                <div>
+                  {events.map((event, index) => (
+                    <EventCard
+                      key={index}
+                      date={event.date}
+                      description={event.description}
+                      eth={event.eth}
+                      title={event.title}
+                      size="small"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <ProgramNotFound variant="contribution" />
+              )}
             </div>
           </div>
         </div>
@@ -205,10 +225,34 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
 export default page;
 
 const items = [
-  { icon: <Angry />, color: "blue", label: "Files" },
-  { icon: <Annoyed />, color: "purple", label: "Books" },
-  { icon: <Frown />, color: "red", label: "Health" },
-  //   { icon: <Laugh />, color: "indigo", label: "Weather" },
-  //   { icon: <Meh />, color: "orange", label: "Notes" },
-  //   { icon: <Smile />, color: "green", label: "Stats" },
+  { image: "/hajimi.png", color: "blue", label: "Achievment 1" },
+  { image: "/hajimi.png", color: "green", label: "Achievment 1" },
+  { image: "/hajimi.png", color: "pink", label: "Achievment 1" },
+  { image: "/hajimi.png", color: "purple", label: "Achievment 1" },
+  { image: "/hajimi.png", color: "red", label: "Achievment 1" },
+];
+
+// List of events
+const events = [
+  {
+    title: "Degree Scholarship 2025",
+    description: "Scholarship for students in degree programs.",
+    eth: 1.0,
+    date: "30 July 2025",
+    size: "large",
+  },
+  {
+    title: "Blockchain Conference",
+    description: "Learn about blockchain innovations.",
+    eth: 0.75,
+    date: "15 Aug 2025",
+    size: "medium",
+  },
+  {
+    title: "AI Hackathon",
+    description: "24-hour hackathon focused on AI solutions.",
+    eth: 1.5,
+    date: "5 Sept 2025",
+    size: "small",
+  },
 ];
