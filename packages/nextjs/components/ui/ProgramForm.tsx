@@ -11,13 +11,29 @@ import { FileInput, FileUploader, FileUploaderContent, FileUploaderItem } from "
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~~/components/ui/form";
 import { Input } from "~~/components/ui/input";
 import { Textarea } from "~~/components/ui/textarea";
+import { uploadToIPFS } from "~~/func/ipfs";
 import { cn } from "~~/lib/utils";
 
 const formSchema = z.object({
-  programTitle: z.string().min(1),
-  programDescription: z.string(),
-  programGoal: z.number().min(1),
-  programMedia: z.string().min(1),
+  programTitle: z
+    .string()
+    .min(1, "Program title is required")
+    .max(100, "Program title must be less than 100 characters"),
+
+  programDescription: z
+    .string()
+    .min(1, "Program description is required")
+    .max(1000, "Program description must be less than 1000 characters"),
+
+  programGoal: z.coerce
+    .number({
+      required_error: "Program goal is required",
+      invalid_type_error: "Program goal must be a number",
+    })
+    .positive("Program goal must be a positive number")
+    .min(1, "Program goal must be at least 1 ether"),
+
+  programMedia: z.array(z.instanceof(File)).min(1, "At least one file is required").max(10, "Maximum 10 files allowed"),
 });
 
 export default function ProgamForm() {
@@ -33,20 +49,25 @@ export default function ProgamForm() {
   };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      programTitle: "",
+      programDescription: "",
+      programGoal: 1,
+      programMedia: [],
+    },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>,
-      );
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
-    }
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    const ipfsUrls = await uploadToIPFS(data.programMedia);
+
+    console.log({
+      title: data.programTitle,
+      description: data.programDescription,
+      goal: data.programGoal,
+      media: ipfsUrls,
+    });
+
+    toast.success("Program created successfully!");
   }
 
   return (
@@ -59,9 +80,8 @@ export default function ProgamForm() {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Degree Level 2 Scholarship Program" type="text" {...field} />
+                <Input placeholder="Scholarship for ..." type="text" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
@@ -108,8 +128,11 @@ export default function ProgamForm() {
               <FormLabel>Supporting Evidence</FormLabel>
               <FormControl>
                 <FileUploader
-                  value={files}
-                  onValueChange={setFiles}
+                  value={field.value || []}
+                  onValueChange={newFiles => {
+                    setFiles(newFiles);
+                    field.onChange(newFiles);
+                  }}
                   dropzoneOptions={dropZoneConfig}
                   className="relative bg-background rounded-lg p-2"
                 >
@@ -142,7 +165,9 @@ export default function ProgamForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <div className="text-right">
+          <Button type="submit">Submit</Button>
+        </div>
       </form>
     </Form>
   );

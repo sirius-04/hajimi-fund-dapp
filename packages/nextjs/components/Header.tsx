@@ -125,7 +125,9 @@ export const Header = () => {
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline" size="lg" className="cursor-pointer">
-              <ShinyText>Create Program</ShinyText>
+              <ShinyText>
+                <h1 className="font-black">Create Program</h1>
+              </ShinyText>
             </Button>
           </DialogTrigger>
 
