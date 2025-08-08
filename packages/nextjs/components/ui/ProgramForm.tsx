@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { DialogClose, DialogFooter } from "./dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CloudUpload, Paperclip } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { parseEther } from "viem";
 import { z } from "zod";
 import { Button } from "~~/components/ui/button";
 import { FileInput, FileUploader, FileUploaderContent, FileUploaderItem } from "~~/components/ui/file-upload";
@@ -12,6 +14,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "~~/components/ui/input";
 import { Textarea } from "~~/components/ui/textarea";
 import { uploadToIPFS } from "~~/func/ipfs";
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
+import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 import { cn } from "~~/lib/utils";
 
 const formSchema = z.object({
@@ -37,6 +41,9 @@ const formSchema = z.object({
 });
 
 export default function ProgamForm() {
+  const { writeContractAsync: writeYourContractAsync } = useScaffoldWriteContract({
+    contractName: "ScholarshipProgramFactory",
+  });
   const [files, setFiles] = useState<File[] | null>(null);
 
   const dropZoneConfig = {
@@ -58,16 +65,19 @@ export default function ProgamForm() {
   });
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    const ipfsUrls = await uploadToIPFS(data.programMedia);
+    const promise = (async () => {
+      const ipfsUrls = await uploadToIPFS(data.programMedia);
+      return writeYourContractAsync({
+        functionName: "createProgram",
+        args: [data.programTitle, data.programDescription, parseEther(data.programGoal.toString()), ipfsUrls],
+      });
+    })();
 
-    console.log({
-      title: data.programTitle,
-      description: data.programDescription,
-      goal: data.programGoal,
-      media: ipfsUrls,
+    toast.promise(promise, {
+      loading: "Creating",
+      success: () => "Program Created!",
+      error: "Error",
     });
-
-    toast.success("Program created successfully!");
   }
 
   return (
@@ -165,9 +175,16 @@ export default function ProgamForm() {
             </FormItem>
           )}
         />
-        <div className="text-right">
-          <Button type="submit">Submit</Button>
-        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline" type="button">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button variant="secondary" type="submit" className="cursor-pointer">
+            Confirm
+          </Button>
+        </DialogFooter>
       </form>
     </Form>
   );

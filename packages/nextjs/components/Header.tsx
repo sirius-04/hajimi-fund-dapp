@@ -7,8 +7,6 @@ import { usePathname } from "next/navigation";
 import { SwitchTheme } from "./SwitchTheme";
 import ProgramForm from "./ui/ProgramForm";
 import ShinyText from "./ui/ShinyText";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import { Compass, Ticket } from "lucide-react";
 import { hardhat } from "viem/chains";
 import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
