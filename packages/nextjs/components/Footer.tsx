@@ -18,7 +18,7 @@ export const Footer = () => {
   const isLocalNetwork = targetNetwork.id === hardhat.id;
 
   return (
-    <footer className="relative w-full z-20 text-muted-foreground text-sm py-6 px-6 flex flex-col items-center justify-center">
+    <footer className="relative w-full z-20 text-muted-foreground text-sm py-4 px-6 flex flex-col items-center justify-center">
       {/* Gradient Top Border */}
       <div
         className="absolute top-0 left-0 w-full h-[1px] pointer-events-none z-[-1]"

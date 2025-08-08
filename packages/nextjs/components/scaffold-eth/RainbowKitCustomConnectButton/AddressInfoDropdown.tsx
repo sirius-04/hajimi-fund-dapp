@@ -87,13 +87,13 @@ export const AddressInfoDropdown = ({
         </HoverBorderGradient>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-64 mt-2 p-2 shadow-md rounded-md bg-popover text-popover-foreground dark:bg-neutral-900">
+      <DropdownMenuContent className="w-64 mt-2 p-2  rounded-md bg-popover text-popover-foreground dark:bg-neutral-900 shadow-xl dark:shadow-[0_0_30px_rgba(255,255,255,0.1)] ">
         {selectingNetwork ? (
           <NetworkOptions hidden={false} />
         ) : (
           <>
             {/* User */}
-            <Link href="/profile">
+            <Link href="/profile/[...address]" as={`/profile/${checkSumAddress}`} passHref>
               <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
                 <User className="h-4 w-4" />
                 Profile
