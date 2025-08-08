@@ -26,34 +26,9 @@ const events = [
 
 const Timeline = () => {
   return (
-    // <div className="flex flex-col space-y-10 py-10 w-full ">
-    //   {events.map((event, idx) => (
-    //     <div key={idx} className="relative flex justify-start">
-    //       {/* Left timeline */}
-    //       <div className="w-28 text-start mr-8">
-    //         <div className="text-lg font-medium">{event.date}</div>
-    //         <div className="text-md text-muted-foreground">{event.day}</div>
-    //       </div>
-
-    //       {/* Dot and Dotted Line */}
-    //       <div className="flex flex-col items-center mx-2 relative">
-    //         {/* Dot */}
-    //         <div className="w-3 h-3 bg-gray-500 rounded-full z-10"></div>
-
-    //         {/* Dotted line only if not last */}
-    //         <div className="flex-1 border-r-2 border-dotted border-gray-400 mt-1"></div>
-    //       </div>
-
-    //       {/* Event Card */}
-    //       <div className="flex-1 ml-6 rounded-xl px-4 flex justify-between items-start ">
-    //         <ProgramCard data={programList} />
-    //       </div>
-    //     </div>
-    //   ))}
-    // </div>
     <>
       {programList.map((list, idx) => (
-        <div className="flex flex-col space-y-10 py-10 w-full" key={idx}>
+        <div className="flex flex-col py-5 w-full" key={idx}>
           <div key={idx} className="relative flex justify-start">
             {/* Left timeline */}
             <div className="w-28 text-start mr-8">
