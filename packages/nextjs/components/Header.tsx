@@ -5,11 +5,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SwitchTheme } from "./SwitchTheme";
+import ProgramForm from "./ui/ProgramForm";
+import ShinyText from "./ui/ShinyText";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 import { Compass, Ticket } from "lucide-react";
 import { hardhat } from "viem/chains";
 import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { Button } from "~~/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -108,6 +122,24 @@ export const Header = () => {
 
       {/* Right actions */}
       <div className="flex items-center justify-end gap-2 w-full">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="lg" className="cursor-pointer">
+              <ShinyText>Create Program</ShinyText>
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Create Program</DialogTitle>
+              <DialogDescription>Enter your program details</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4">
+              <ProgramForm />
+            </div>
+          </DialogContent>
+        </Dialog>
+
         <RainbowKitCustomConnectButton />
         <SwitchTheme />
         {/* {isLocalNetwork && <FaucetButton />} */}

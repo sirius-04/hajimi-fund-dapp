@@ -14,8 +14,8 @@ contract ScholarshipProgramFactory {
         string[] mediaCIDs,
         uint goal,
         uint timestamp
-    );
-
+    ); 
+    
     function createProgram(
         string memory _title,
         string memory _description,
