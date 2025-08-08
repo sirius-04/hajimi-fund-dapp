@@ -36,22 +36,18 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
               <h1 className="text-3xl font-bold text-foreground">
                 {checkSumAddress?.slice(0, 6)}...{checkSumAddress?.slice(-4)}
               </h1>
-              <Button variant="outline" className="flex items-center gap-2 cursor-pointer">
-                <PencilRuler className="w-4 h-4" />
-                Edit Profile
-              </Button>
+              {checkSumAddress === id && (
+                <Button variant="outline" className="flex items-center gap-2 cursor-pointer">
+                  <PencilRuler className="w-4 h-4" />
+                  Edit Profile
+                </Button>
+              )}
             </div>
 
             <div className="text-muted-foreground max-w-[30rem] w-full text-sm mt-1">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
               dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
               ea commodo consequat.
-            </div>
-
-            <div className="flex flex-wrap gap-2 mt-3 ">
-              <Badge className="bg-violet-500 dark:bg-violet-400">Degree</Badge>
-              <Badge className="bg-sky-600 not-odd:dark:bg-sky-400">Computer Science</Badge>
-              <Badge className="bg-green-400">APU</Badge>
             </div>
 
             <div className="flex items-center space-x-4 h-5 text-sm text-muted-foreground mt-3">
