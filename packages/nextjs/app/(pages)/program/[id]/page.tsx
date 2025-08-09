@@ -3,12 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-// import { BlockieAvatar } from "~~/components/scaffold-eth";
+import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { Modal, ModalTrigger } from "~~/components/ui/animated-modal";
 import { AnimatedTestimonials } from "~~/components/ui/animated-testimonials";
 import { BackgroundGradient } from "~~/components/ui/background-gradient";
 import { Button } from "~~/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~~/components/ui/card";
+import { PlaceholdersAndVanishInput } from "~~/components/ui/placeholders-and-vanish-input";
 import { Progress } from "~~/components/ui/progress";
 
 // interface GridItemProps {
@@ -28,6 +29,9 @@ const Page = () => {
   const [funded] = React.useState(true);
   const [creator] = React.useState(false);
   const [contributor] = React.useState(true);
+  const [showInput, setShowInput] = React.useState(false);
+  const [amount, setAmount] = React.useState("");
+  const [success, setSuccess] = React.useState(false);
 
   React.useEffect(() => {
     const timer = setTimeout(() => setProgress(66), 500);
@@ -36,10 +40,10 @@ const Page = () => {
 
   return (
     <div className="w-full h-full py-20">
-      <h2 className="max-w-7xl pl-4 mt-5 mx-auto text-xl text-center md:text-5xl font-bold text-neutral-800 dark:text-neutral-200 font-sans">
+      <h2 className="max-w-7xl pl-4 mt-5 mx-auto text-xl text-center md:text-5xl font-bold text-neutral-800 dark:text-neutral-200">
         Degree Scholarship 2025
       </h2>
-      <p className="max-w-7xl pl-4 mx-auto mt-2 text-center text-base md:text-xl font-sans text-neutral-600 dark:text-neutral-400">
+      <p className="max-w-7xl pl-4 mx-auto mt-2 text-center text-base md:text-xl text-neutral-600 dark:text-neutral-400">
         Fundraising organised by Hajimi
       </p>
       {/* Testimonials */}
@@ -49,8 +53,8 @@ const Page = () => {
         </div>
         {/* Donate Card */}
         <div className="relative w-95 self-start mt-8">
-          <BackgroundGradient className="bg-white dark:bg-zinc-900 rounded-4xl">
-            <Card className="w-full max-w-sm h-100">
+          <BackgroundGradient className="bg-white dark:bg-zinc-900 rounded-[22px]">
+            <Card className="w-full max-w-sm h-100 rounded-[22px]">
               <CardHeader>
                 <CardTitle className="text-center text-4xl">RM10000</CardTitle>
                 <CardDescription className="text-center">Raised of RM20000 goals</CardDescription>
@@ -59,22 +63,25 @@ const Page = () => {
                 <div className="flex-col gap-6 mt-15">
                   <Progress value={progress} className="w-full" />
                   <div className="flex justify-end mt-2">
-                    <span className="text-sm font-semibold">Contributor:</span>
-                    {/* <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
-                      {contributors.map((addr, idx) => (
-                        <BlockieAvatar key={idx} address={addr} size={20} />
-                      ))}
-                    </div> */}
+                    <span className="text-sm font-semibold mr-2">Contributor:</span>
+                    <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+                      <BlockieAvatar address="0x34aA3F359A9D614239015126635CE7732c18fDF3" size={24} />
+                      <BlockieAvatar address="0x34aA3F359A9D614239015126635CE7732c18fDF3" size={24} />
+                      <BlockieAvatar address="0x34aA3F359A9D614239015126635CE7732c18fDF3" size={24} />
+                    </div>
                   </div>
                 </div>
               </CardContent>
               <CardFooter className="flex-col mt-auto gap-2">
                 <Modal>
                   <ModalTrigger className="bg-black dark:bg-white dark:text-black text-white w-full flex justify-center group/modal-btn">
-                    <span className="group-hover/modal-btn:translate-x-60 text-center transition duration-400">
+                    <div className="group-hover/modal-btn:translate-x-60 text-center transition duration-400">
                       {funded ? "Fund More" : "Fund their future"}
-                    </span>
-                    <div className="-translate-x-60 group-hover/modal-btn:translate-x-0 flex items-center justify-center absolute inset-0 transition duration-400 text-white z-30">
+                    </div>
+                    <div
+                      className="-translate-x-60 group-hover/modal-btn:translate-x-0 flex items-center justify-center absolute inset-0 transition duration-400 text-white z-30"
+                      onClick={() => setShowInput(true)}
+                    >
                       💵
                     </div>
                   </ModalTrigger>
@@ -95,6 +102,27 @@ const Page = () => {
                   </Link>
                 )}
               </CardFooter>
+              {showInput && (
+                <div className="absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50 px-4 rounded-[22px] ">
+                  <div className="bg-white dark:bg-zinc-900 p-3 shadow-lg w-full max-w-md">
+                    <PlaceholdersAndVanishInput
+                      placeholders={["Enter Amount in ETH", "Thanks for your contributions!"]}
+                      onChange={e => {
+                        setAmount(e.target.value);
+                      }}
+                      onSubmit={e => {
+                        e.preventDefault();
+                        setShowInput(false);
+                      }}
+                    />
+                    <div className="mt-4 flex justify-end">
+                      <Button variant="outline" onClick={() => setShowInput(false)}>
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </Card>
           </BackgroundGradient>
         </div>
@@ -141,3 +169,16 @@ const testimonials = [
     src: "https://images.unsplash.com/photo-1624561172888-ac93c696e10c?q=80&w=2592&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
 ];
+
+export function PlaceholdersAndVanishInputDemo() {
+  const placeholders = ["Enter Amount in ETH", "Thanks for your contributions!"];
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.value);
+  };
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("submitted");
+  };
+  return <PlaceholdersAndVanishInput placeholders={placeholders} onChange={handleChange} onSubmit={onSubmit} />;
+}
