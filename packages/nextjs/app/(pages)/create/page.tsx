@@ -1,4 +1,5 @@
 import React from "react";
+import { gql, useQuery } from "@apollo/client";
 import ProgramNotFound from "~~/components/ProgramNotFound";
 import Timeline from "~~/components/Timeline";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~~/components/ui/tabs";
