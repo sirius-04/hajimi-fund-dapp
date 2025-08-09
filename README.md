@@ -1,6 +1,6 @@
-# 🏗 Hajimi Fund
+🏗 Hajimi Fund
 
-- An Decentralized Scholarship Crowdfunding Platform that empowering students through transparent and blockchain-based fundraising.
+An Decentralized Scholarship Crowdfunding Platform that empowering students through transparent and blockchain-based fundraising.
 
 ⚙️ TechStack: Built using NextJS, RainbowKit, Hardhat, Wagmi, Viem, and Typescript.
 
