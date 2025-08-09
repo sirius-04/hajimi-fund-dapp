@@ -218,7 +218,7 @@ const Page = () => {
             <DialogHeader>
               <DialogTitle>Create a New Request</DialogTitle>
             </DialogHeader>
-            <RequestForm />
+            <RequestForm address={`0x00000000000000000000000000`} />
           </DialogContent>
         </Dialog>
       </div>

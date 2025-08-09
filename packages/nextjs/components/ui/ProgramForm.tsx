@@ -35,7 +35,7 @@ const formSchema = z.object({
       invalid_type_error: "Program goal must be a number",
     })
     .positive("Program goal must be a positive number")
-    .min(1, "Program goal must be at least 1 ether"),
+    .min(0.00001, "Program goal must be at least 1 ether"),
 
   programMedia: z.array(z.instanceof(File)).min(1, "At least one file is required").max(10, "Maximum 10 files allowed"),
 });
