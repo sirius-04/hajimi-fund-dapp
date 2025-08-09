@@ -1,21 +1,27 @@
-# 🏗 Scaffold-ETH 2
+# 🏗 Hajimi Fund
 
-<h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
-</h4>
+- An Decentralized Scholarship Crowdfunding Platform that empowering students through transparent and blockchain-based fundraising.
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+⚙️ TechStack: Built using NextJS, RainbowKit, Hardhat, Wagmi, Viem, and Typescript.
 
-⚙️ Built using NextJS, RainbowKit, Hardhat, Wagmi, Viem, and Typescript.
+Key Feature:
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+🎯 Goal-Based Campaigns – Students set clear funding goals, deadlines, and project descriptions.
 
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/b237af0c-5027-4849-a5c1-2e31495cccb1)
+💰 Web3 Donations – Supporters contribute using Ethereum.
+
+🌟 Donor Approver Role – Major contributors become “Approvers” with voting rights on fund usage.
+
+🗳 DAO-Style Voting – Students submit spending requests with proof and approvers vote to approve or reject.
+
+⚡ Automatic Fund Release – Approved requests instantly transfer funds to the student’s wallet via smart contracts.
+
+🔒 Secure Donations – Funds remain locked until the funding goal is reached.
+
+📚 Proof of Achievement – Students upload results and achievements to increase trust for future campaigns.
+
+🛠 Program Creation – Build and manage multiple scholarship or project funding programs.
+
 
 ## Requirements
 
@@ -27,7 +33,7 @@ Before you begin, you need to install the following tools:
 
 ## Quickstart
 
-To get started with Scaffold-ETH 2, follow the steps below:
+To get started with Hajimi Fund, follow the steps below:
 
 1. Install dependencies if it was skipped in CLI:
 
@@ -58,23 +64,11 @@ This command deploys a test smart contract to the local network. The contract is
 yarn start
 ```
 
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
+Visit the app on: `http://localhost:3000`. Interact with your smart contract using the `Debug Contracts` page. Tweak the app config in `packages/nextjs/scaffold.config.ts`.
 
 Run smart contract test with `yarn hardhat:test`
 
 - Edit your smart contracts in `packages/hardhat/contracts`
 - Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
 - Edit your deployment scripts in `packages/hardhat/deploy`
-
-
-## Documentation
-
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
-
-To know more about its features, check out our [website](https://scaffoldeth.io).
-
-## Contributing to Scaffold-ETH 2
-
-We welcome contributions to Scaffold-ETH 2!
-
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+  
