@@ -27,7 +27,7 @@ const events = [
 const Timeline = () => {
   return (
     <>
-      {programList.map((list, idx) => (
+      {programList.map((list: any, idx: number) => (
         <div className="flex flex-col py-5 w-full" key={idx}>
           <div key={idx} className="relative flex justify-start">
             {/* Left timeline */}

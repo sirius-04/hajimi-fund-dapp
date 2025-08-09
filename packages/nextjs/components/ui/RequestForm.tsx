@@ -13,7 +13,7 @@ import { FileInput, FileUploader, FileUploaderContent, FileUploaderItem } from "
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~~/components/ui/form";
 import { Input } from "~~/components/ui/input";
 import { Textarea } from "~~/components/ui/textarea";
-import { abi } from "~~/contracts/ScholarshipProgram.json";
+import abi from "~~/contracts/ScholarshipProgram.json";
 import { uploadToIPFS } from "~~/func/ipfs";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
