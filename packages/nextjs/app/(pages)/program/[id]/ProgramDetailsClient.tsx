@@ -210,7 +210,7 @@ function ProgramDetailsClient({ address }: { address: `0x${string}` }) {
                       </Link>
                     )}
 
-                    {isCreator && isContributor && (
+                    {(isCreator || isContributor) && (
                       <Link href={`/program/${address}/requests`} className="w-full">
                         <Button variant="outline" className="w-full">
                           View Requests
