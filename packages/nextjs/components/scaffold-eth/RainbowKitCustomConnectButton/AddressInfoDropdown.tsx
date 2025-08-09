@@ -2,7 +2,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { NetworkOptions } from "./NetworkOptions";
 import { ChevronDown, User } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { getAddress } from "viem";
 import { Address } from "viem";
 import { useAccount, useDisconnect } from "wagmi";
