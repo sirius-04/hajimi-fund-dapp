@@ -1,0 +1,21 @@
+# query write here
+query getProgramById($id: ID!) {
+  program(id: $id) {
+    id
+    title
+    description
+    startDate
+    endDate
+    status
+    creator {
+      id
+      name
+      avatarUrl
+    }
+    participants {
+      id
+      name
+      avatarUrl
+    }
+  }
+}
