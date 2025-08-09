@@ -15,8 +15,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowLeft, FilePlus } from "lucide-react";
-import RequestETH from "~~/components/RequestETH";
+import { ArrowLeft } from "lucide-react";
 import RequestForm from "~~/components/ui/RequestForm";
 import { BackgroundBeams } from "~~/components/ui/background-beams";
 import { Badge } from "~~/components/ui/badge";
@@ -131,17 +130,9 @@ const columns: ColumnDef<Request>[] = [
       return <Button variant="ghost">Title</Button>;
     },
     cell: ({ row }) => (
-      <Dialog>
-        <DialogTrigger asChild>
-          <div className="cursor-pointer hover:underline lowercase">{row.getValue("title")}</div>
-        </DialogTrigger>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Create a New Request</DialogTitle>
-          </DialogHeader>
-          <RequestETH />
-        </DialogContent>
-      </Dialog>
+      <Link href="/requests" className="cursor-pointer hover:underline lowercase">
+        {row.getValue("title")}
+      </Link>
     ),
   },
   {
@@ -186,7 +177,6 @@ const columns: ColumnDef<Request>[] = [
 const Page = () => {
   const params = useParams();
   const programId = params.id as string;
-  const [showForm, setShowForm] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
