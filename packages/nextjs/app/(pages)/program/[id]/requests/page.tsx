@@ -105,81 +105,83 @@ interface Request {
   date: string;
 }
 
-function ApprovalsCell() {
-  const [progress, setProgress] = useState(13);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setProgress(66), 500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  return <Progress value={progress} className="w-30 mx-auto" />;
-}
-
-const columns: ColumnDef<Request>[] = [
-  {
-    accessorKey: "id",
-    header: () => {
-      return <Button variant="ghost">Id</Button>;
-    },
-    cell: ({ row }) => <div className="lowercase p-2 mx-auto ml-2">{row.getValue("id")}</div>,
-  },
-  {
-    accessorKey: "title",
-    header: () => {
-      return <Button variant="ghost">Title</Button>;
-    },
-    cell: ({ row }) => (
-      <Link href="/requests" className="cursor-pointer hover:underline lowercase">
-        {row.getValue("title")}
-      </Link>
-    ),
-  },
-  {
-    accessorKey: "amount",
-    header: () => <div className="text-center">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-      return <div className="text-center font-medium">{formatted}</div>;
-    },
-  },
-  {
-    id: "approvals",
-    header: () => <div className="text-center">Approvals</div>,
-    cell: () => {
-      return (
-        <div className="flex items-center justify-center">
-          <ApprovalsCell />
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "status",
-    header: () => <div className="text-center w-20">Status</div>,
-    cell: ({ row }) => {
-      const status = row.getValue("status") as string;
-      const bgColor = status === "processing" ? "bg-amber-600" : status === "success" ? "bg-green-600" : "bg-red-500";
-      return <Badge className={`capitalize ${bgColor} dark:text-white w-20 text-center`}>{status}</Badge>;
-    },
-  },
-  {
-    accessorKey: "date",
-    header: "Date",
-    cell: ({ row }) => <div>{row.getValue("date")}</div>,
-  },
-];
-const Page = () => {
-  const params = useParams();
-  const programId = params.id as string;
+export default function RequestListPage() {
+  const param = useParams();
+  const programId = param.id as `0x${string}`;
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
+  const requestId = 1;
+
+  function ApprovalsCell() {
+    const [progress, setProgress] = useState(13);
+
+    useEffect(() => {
+      const timer = setTimeout(() => setProgress(66), 500);
+      return () => clearTimeout(timer);
+    }, []);
+
+    return <Progress value={progress} className="w-30 mx-auto" />;
+  }
+  const columns: ColumnDef<Request>[] = [
+    {
+      accessorKey: "id",
+      header: () => {
+        return <Button variant="ghost">Id</Button>;
+      },
+      cell: ({ row }) => <div className="lowercase p-2 mx-auto ml-2">{row.getValue("id")}</div>,
+    },
+    {
+      accessorKey: "title",
+      header: () => {
+        return <Button variant="ghost">Title</Button>;
+      },
+      cell: ({ row }) => (
+        <Link href={`/program/${programId}/requests/${requestId}`} className="cursor-pointer hover:underline lowercase">
+          {row.getValue("title")}
+        </Link>
+      ),
+    },
+    {
+      accessorKey: "amount",
+      header: () => <div className="text-center">Amount</div>,
+      cell: ({ row }) => {
+        const amount = parseFloat(row.getValue("amount"));
+        // Format the amount as a dollar amount
+        const formatted = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(amount);
+        return <div className="text-center font-medium">{formatted}</div>;
+      },
+    },
+    {
+      id: "approvals",
+      header: () => <div className="text-center">Approvals</div>,
+      cell: () => {
+        return (
+          <div className="flex items-center justify-center">
+            <ApprovalsCell />
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "status",
+      header: () => <div className="text-center w-20">Status</div>,
+      cell: ({ row }) => {
+        const status = row.getValue("status") as string;
+        const bgColor = status === "processing" ? "bg-amber-600" : status === "success" ? "bg-green-600" : "bg-red-500";
+        return <Badge className={`capitalize ${bgColor} dark:text-white w-20 text-center`}>{status}</Badge>;
+      },
+    },
+    {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }) => <div>{row.getValue("date")}</div>,
+    },
+  ];
+
   const table = useReactTable({
     data,
     columns,
@@ -196,6 +198,7 @@ const Page = () => {
       rowSelection,
     },
   });
+
   return (
     <div className="w-full h-full py-20 px-10 mt-5">
       <BackgroundBeams />
@@ -277,6 +280,4 @@ const Page = () => {
       </div>
     </div>
   );
-};
-
-export default Page;
+}
