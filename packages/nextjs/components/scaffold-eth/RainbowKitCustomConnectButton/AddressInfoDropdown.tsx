@@ -79,7 +79,7 @@ export const AddressInfoDropdown = ({
           as="button"
           className="dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2 cursor-pointer text-sm px-3 py-1.5"
         >
-          <BlockieAvatar address={checkSumAddress} size={30} ensImage={ensAvatar} />
+          <BlockieAvatar address={checkSumAddress} size={25} ensImage={ensAvatar} />
           <span className="ml-2">
             {isENS(displayName) ? displayName : `${checkSumAddress?.slice(0, 6)}...${checkSumAddress?.slice(-4)}`}
           </span>
