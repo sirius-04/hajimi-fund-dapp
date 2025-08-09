@@ -59,7 +59,7 @@ function RequestDetailsClient({ address }: { address: `0x${string}` }) {
 
   let requestData: any[] = [];
 
-  if (data && data[0]?.result) {
+  if (data && Array.isArray(data[0]?.result)) {
     requestData = data[0].result.map((req: any) => ({
       id: Number(req.id),
       title: req.title,
@@ -159,7 +159,11 @@ function RequestDetailsClient({ address }: { address: `0x${string}` }) {
             <DialogHeader>
               <DialogTitle>Create a New Request</DialogTitle>
             </DialogHeader>
-            <RequestForm address={account.address} />
+            {account.address ? (
+              <RequestForm address={account.address as `0x${string}`} />
+            ) : (
+              <div className="text-red-500">No account address found.</div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
