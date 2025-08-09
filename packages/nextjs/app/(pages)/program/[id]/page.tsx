@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { Modal, ModalTrigger } from "~~/components/ui/animated-modal";
 import { AnimatedTestimonials } from "~~/components/ui/animated-testimonials";
+import { BackgroundBeams } from "~~/components/ui/background-beams";
 import { BackgroundGradient } from "~~/components/ui/background-gradient";
 import { Button } from "~~/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~~/components/ui/card";
@@ -40,6 +41,7 @@ const Page = () => {
 
   return (
     <div className="w-full h-full py-20">
+      <BackgroundBeams />
       <h2 className="max-w-7xl pl-4 mt-5 mx-auto text-xl text-center md:text-5xl font-bold text-neutral-800 dark:text-neutral-200">
         Degree Scholarship 2025
       </h2>
@@ -74,8 +76,8 @@ const Page = () => {
               </CardContent>
               <CardFooter className="flex-col mt-auto gap-2">
                 <Modal>
-                  <ModalTrigger className="bg-black dark:bg-white dark:text-black text-white w-full flex justify-center group/modal-btn">
-                    <div className="group-hover/modal-btn:translate-x-60 text-center transition duration-400">
+                  <ModalTrigger className="bg-black dark:bg-white dark:text-black text-white w-full flex justify-center group/modal-btn cursor-pointer">
+                    <div className="group-hover/modal-btn:translate-x-60 text-center transition duration-40 ">
                       {funded ? "Fund More" : "Fund their future"}
                     </div>
                     <div
@@ -88,7 +90,7 @@ const Page = () => {
                 </Modal>
                 {creator && (
                   <Link href={`/program/${id}/requests`} className="w-full">
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full cursor-pointer">
                       Create Request
                     </Button>
                   </Link>
@@ -96,7 +98,7 @@ const Page = () => {
 
                 {!creator && (contributor || approver) && (
                   <Link href={`/program/${id}/requests`} className="w-full">
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full cursor-pointer">
                       View Requests
                     </Button>
                   </Link>
@@ -104,7 +106,7 @@ const Page = () => {
               </CardFooter>
               {showInput && (
                 <div className="absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50 px-4 rounded-[22px] ">
-                  <div className="bg-white dark:bg-zinc-900 p-3 shadow-lg w-full max-w-md">
+                  <div className="p-3 w-full max-w-md">
                     <PlaceholdersAndVanishInput
                       placeholders={["Enter Amount in ETH", "Thanks for your contributions!"]}
                       onChange={e => {
@@ -116,7 +118,7 @@ const Page = () => {
                       }}
                     />
                     <div className="mt-4 flex justify-end">
-                      <Button variant="outline" onClick={() => setShowInput(false)}>
+                      <Button variant="outline" onClick={() => setShowInput(false)} className="cursor-pointer">
                         Cancel
                       </Button>
                     </div>
@@ -129,7 +131,7 @@ const Page = () => {
       </div>
       <div className="max-w-7xl mx-auto px-4 py-10">
         <h2 className="font-bold text-2xl underline">Requestor Story</h2>
-        <div className="mt-4">
+        <div className="mt-4 text-muted-foreground">
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab at, velit veniam rerum repellat voluptatibus
           dignissimos mollitia modi id sapiente neque commodi laudantium quis minus enim porro esse cum. Laudantium
           voluptates minus odio vel, assumenda numquam? Asperiores, maxime commodi ipsa maiores quam minus nemo ipsam

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -15,7 +16,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowLeft, FilePlus } from "lucide-react";
+import RequestETH from "~~/components/RequestETH";
 import RequestForm from "~~/components/ui/RequestForm";
+import { BackgroundBeams } from "~~/components/ui/background-beams";
 import { Badge } from "~~/components/ui/badge";
 import { Button } from "~~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "~~/components/ui/dialog";
@@ -127,7 +130,19 @@ const columns: ColumnDef<Request>[] = [
     header: () => {
       return <Button variant="ghost">Title</Button>;
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("title")}</div>,
+    cell: ({ row }) => (
+      <Dialog>
+        <DialogTrigger asChild>
+          <div className="cursor-pointer hover:underline lowercase">{row.getValue("title")}</div>
+        </DialogTrigger>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Create a New Request</DialogTitle>
+          </DialogHeader>
+          <RequestETH />
+        </DialogContent>
+      </Dialog>
+    ),
   },
   {
     accessorKey: "amount",
@@ -193,9 +208,10 @@ const Page = () => {
   });
   return (
     <div className="w-full h-full py-20 px-10 mt-5">
+      <BackgroundBeams />
       <div className="flex items-center justify-between py-4">
-        <Link href={`/program/${programId}`}>
-          <button className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800">
+        <Link href={`/program/${programId}`} className="z-10 ">
+          <button className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 cursor-pointer">
             <ArrowLeft className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:rotate-12 dark:text-neutral-400" />
           </button>
         </Link>
@@ -204,7 +220,7 @@ const Page = () => {
         </Button> */}
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline" className="cursor-pointer">
+            <Button variant="outline" className="cursor-pointer z-10">
               Create Requests
             </Button>
           </DialogTrigger>
