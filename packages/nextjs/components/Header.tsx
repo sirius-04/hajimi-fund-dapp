@@ -66,7 +66,7 @@ export const Header = () => {
   const isLocalNetwork = targetNetwork.id === hardhat.id;
 
   return (
-    <header className="fixed top-0 z-20 w-full bg-background border dark:border-b-neutral-800 border-b-neutral-200 p-3 md:px-6 md:py-3 flex items-center justify-between ">
+    <header className="fixed top-0 z-50 w-full bg-background border dark:border-b-neutral-800 border-b-neutral-200 p-3 md:px-6 md:py-3 flex items-center justify-between ">
       <div className="flex items-center gap-4 container ">
         {/* Mobile menu */}
         <div className="lg:hidden">
