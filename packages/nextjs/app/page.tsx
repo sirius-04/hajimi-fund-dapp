@@ -59,8 +59,8 @@ const Home: NextPage = () => {
       price: p.goal ? formatEther(p.goal) : "0.00",
     })) ?? [];
 
-  const contributedPrograms = programList.filter(
-    p => !p.contributors.some(contributor => contributor === account.address),
+  const contributedPrograms = programList.filter(p =>
+    p.contributors.some(contributor => contributor === account.address),
   );
 
   return (

@@ -54,18 +54,18 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
   }, []);
 
   return (
-    <ApolloProvider client={client}>
-      <WagmiProvider config={wagmiConfig}>
-        <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider
-            avatar={BlockieAvatar}
-            theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
-          >
-            {/* <ProgressBar height="3px" color="#2299dd" /> */}
-            <ScaffoldEthApp>{children}</ScaffoldEthApp>
-          </RainbowKitProvider>
-        </QueryClientProvider>
-      </WagmiProvider>
-    </ApolloProvider>
+    // <ApolloProvider client={client}>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider
+          avatar={BlockieAvatar}
+          theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
+        >
+          {/* <ProgressBar height="3px" color="#2299dd" /> */}
+          <ScaffoldEthApp>{children}</ScaffoldEthApp>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+    // </ApolloProvider>
   );
 };
