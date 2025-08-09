@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import StatusBadge from "./StatusBadge";
 import GradientText from "./ui/GradientText";
 import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
@@ -78,14 +79,14 @@ export const GridItem = ({
             <div className="flex items-center justify-between w-full">
               {/* Left: Image */}
               <div className="min-w-24 min-h-24 w-24 h-24">
-                <BlockieAvatar address="0x34aA3F359A9D614239015126635CE7732c18fDF3" size={100} />
+                <BlockieAvatar address={id} size={100} />
               </div>
 
               {/* Center: Text */}
               <div className="flex-1 pl-4">
                 <div className="flex justify-between items-center ">
                   <h2 className="font-bold text-lg md:text-xl mb-1">{title}</h2>
-                  <Badge className="h-6 bg-violet-500 text-white ">{badgeText}</Badge>
+                  <StatusBadge status={badgeText} />
                 </div>
 
                 <div className="flex justify-between items-center gap-2">
@@ -136,7 +137,7 @@ export const GridItem = ({
                   <Separator orientation="vertical" />
                   <div className="flex items-center gap-2">
                     <CalendarDays size="20" />
-                    <p>{date}</p>
+                    {date}
                   </div>
                 </div>
               </div>

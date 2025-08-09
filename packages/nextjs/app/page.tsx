@@ -12,21 +12,34 @@ import {
   Landmark,
   MonitorSmartphone,
   Scroll,
+  UserX,
 } from "lucide-react";
 import type { NextPage } from "next";
 import { FaEthereum } from "react-icons/fa";
 import { formatEther } from "viem";
+import { useAccount } from "wagmi";
 import { ProgramCard } from "~~/components/ProgramCard";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { Button } from "~~/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~~/components/ui/card";
+import { Skeleton } from "~~/components/ui/skeleton";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "~~/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~~/components/ui/tabs";
 import { useDeployedPrograms } from "~~/hooks/useDeployedPrograms";
 
 const Home: NextPage = () => {
-  const { structuredPrograms } = useDeployedPrograms();
+  const { structuredPrograms, isPending } = useDeployedPrograms();
   const [isOpen, setIsOpen] = useState(true);
   const hasMountedOnce = useRef(false);
+  const account = useAccount();
 
   // for right panel toggle
   useEffect(() => {
@@ -45,6 +58,10 @@ const Home: NextPage = () => {
       date: p.createdAt ? new Date(Number(p.createdAt) * 1000).toDateString() : "",
       price: p.goal ? formatEther(p.goal) : "0.00",
     })) ?? [];
+
+  const contributedPrograms = programList.filter(
+    p => !p.contributors.some(contributor => contributor === account.address),
+  );
 
   return (
     <div className="relative w-full mt-18">
@@ -80,7 +97,17 @@ const Home: NextPage = () => {
 
             {/* ----- Main content -----  */}
             <div className="h-full w-full mt-3">
-              <ProgramCard data={programList} />
+              {!isPending && programList.length === 0 && (
+                <p className="text-center text-muted-foreground mt-4">No programs found.</p>
+              )}
+
+              {isPending ? (
+                Array.from({ length: 5 }).map((_, idx) => (
+                  <Skeleton key={idx} className="h-[150px] w-full rounded-xl mb-3" />
+                ))
+              ) : (
+                <ProgramCard data={programList} />
+              )}
             </div>
           </div>
         </motion.div>
@@ -111,40 +138,54 @@ const Home: NextPage = () => {
                   </Button>
                 </div>
 
-                {/* -----  table content -----  */}
                 <div className="mt-4 max-h-[70%] h-full overflow-y-auto">
-                  <Table>
-                    <TableHeader className="text-muted-foreground">
-                      <TableRow>
-                        <TableHead className="text-muted-foreground">Program</TableHead>
-                        <TableHead className="text-muted-foreground text-right">ETH</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody className="cursor-pointer text-md">
-                      {tableDate.map((data, index) => (
-                        <TableRow key={index} className="hover:underline h-16">
-                          <TableCell className="font-medium">
-                            <Link href={`/program/${data.id}`} className="block w-full h-full" key={index}>
-                              <div className="flex gap-2 items-center">
-                                <BlockieAvatar address="0xfc9400703dA075a14C9Cc4b87726FA90aDc055F2" size={25} />
-                                <p>{data.programName}</p>
-                              </div>
-                            </Link>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Link href={`/program/${data.id}`} className="block w-full h-full" key={index}>
-                              <div className="flex gap-2 items-center justify-end">
-                                <p>{data.eth}</p>
-                                <div className="text-violet-400">
-                                  <FaEthereum size="20" />
-                                </div>
-                              </div>
-                            </Link>
-                          </TableCell>
-                        </TableRow>
+                  {isPending ? (
+                    <div className="flex flex-col mt-4">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <Skeleton key={index} className="h-20 w-full rounded-lg mb-2" />
                       ))}
-                    </TableBody>
-                  </Table>
+                    </div>
+                  ) : contributedPrograms.length > 0 ? (
+                    <Table>
+                      <TableHeader className="text-muted-foreground">
+                        <TableRow>
+                          <TableHead className="text-muted-foreground">Program</TableHead>
+                          <TableHead className="text-muted-foreground text-right">ETH</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="cursor-pointer text-md">
+                        {contributedPrograms.map((data, index) => (
+                          <TableRow key={index} className="hover:underline h-16">
+                            <TableCell className="font-medium">
+                              <Link href={`/program/${data.id}`} className="block w-full h-full" key={index}>
+                                <div className="flex gap-2 items-center">
+                                  <BlockieAvatar address={data.id} size={25} />
+                                  <p className="truncate max-w-xs">{data.title}</p>
+                                </div>
+                              </Link>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Link href={`/program/${data.id}`} className="block w-full h-full" key={index}>
+                                <div className="flex gap-2 items-center justify-end">
+                                  <p>{data.price}</p>
+                                  <div className="text-violet-400">
+                                    <FaEthereum size="20" />
+                                  </div>
+                                </div>
+                              </Link>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <Card className="mt-4">
+                      <CardContent className="flex flex-col items-center justify-center text-center">
+                        <UserX />
+                        <p>No Contributions</p>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               </motion.div>
             )}

@@ -148,13 +148,13 @@ export const AnimatedTestimonials = ({
             <div className="flex gap-4">
               <button
                 onClick={handlePrev}
-                className="group/button cursor-pointer flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800"
+                className="group/button cursor-pointer flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 z-30"
               >
                 <ArrowLeft className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:rotate-12 dark:text-neutral-400" />
               </button>
               <button
                 onClick={handleNext}
-                className="group/button cursor-pointer flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800"
+                className="group/button cursor-pointer flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 z-30"
               >
                 <ArrowRight className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:-rotate-12 dark:text-neutral-400" />
               </button>
@@ -163,7 +163,7 @@ export const AnimatedTestimonials = ({
               {showAddFile && (
                 <button
                   // onClick={handleNext}
-                  className="group/button cursor-pointer flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800"
+                  className="group/button cursor-pointer flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 z-30"
                   onClick={handleButtonClick}
                 >
                   <ImagePlus className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:-rotate-12 dark:text-neutral-400" />
