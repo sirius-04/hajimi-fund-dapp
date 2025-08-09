@@ -56,7 +56,7 @@ const Home: NextPage = () => {
       badgeText: p.status ?? "",
       contributors: p.contributors ?? [],
       date: p.createdAt ? new Date(Number(p.createdAt) * 1000).toDateString() : "",
-      price: p.goal ? Number(formatEther(p.goal)).toFixed(2) : "0.00",
+      price: p.goal ? formatEther(p.goal) : "0.00",
     })) ?? [];
 
   const contributedPrograms = programList.filter(

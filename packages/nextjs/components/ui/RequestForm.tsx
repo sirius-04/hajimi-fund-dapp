@@ -7,6 +7,7 @@ import { CloudUpload, Paperclip } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { parseEther } from "viem";
+import { useWriteContract } from "wagmi";
 import { z } from "zod";
 import { Button } from "~~/components/ui/button";
 import { FileInput, FileUploader, FileUploaderContent, FileUploaderItem } from "~~/components/ui/file-upload";
@@ -15,8 +16,6 @@ import { Input } from "~~/components/ui/input";
 import { Textarea } from "~~/components/ui/textarea";
 import abi from "~~/contracts/ScholarshipProgram.json";
 import { uploadToIPFS } from "~~/func/ipfs";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
-import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 import { cn } from "~~/lib/utils";
 
 const formSchema = z.object({
@@ -36,19 +35,13 @@ const formSchema = z.object({
       invalid_type_error: "Request goal must be a number",
     })
     .positive("Request goal must be a positive number")
-    .min(1, "Request goal must be at least 1 ether"),
+    .min(0.00001, "Request goal must be at least 1 ether"),
 
   requestMedia: z.array(z.instanceof(File)).min(1, "At least one file is required").max(10, "Maximum 10 files allowed"),
 });
 
-export default function RequestForm() {
-  //   const { writeContractAsync: writeYourContractAsync } = useScaffoldWriteContract({
-  //     contract: {
-  //       contractAddress: "0xYourScholarshipProgramAddress",
-  //       //   contractName: "ScholarshipProgram",
-  //       contractAbi: abi,
-  //     },
-  //   });
+export default function RequestForm({ address }: { address: `0x${string}` }) {
+  const { writeContractAsync } = useWriteContract();
   const [files, setFiles] = useState<File[] | null>(null);
 
   const dropZoneConfig = {
@@ -72,10 +65,12 @@ export default function RequestForm() {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     const promise = (async () => {
       const ipfsUrls = await uploadToIPFS(data.requestMedia);
-      //   return writeYourContractAsync({
-      //     functionName: "createRequest",
-      //     args: [data.requestTitle, data.requestDescription, parseEther(data.requestAmount.toString()), ipfsUrls],
-      //   });
+      return writeContractAsync({
+        address: address,
+        abi: abi,
+        functionName: "createRequest",
+        args: [data.requestTitle, data.requestDescription, parseEther(data.requestAmount.toString()), ipfsUrls],
+      });
     })();
 
     toast.promise(promise, {
@@ -95,7 +90,7 @@ export default function RequestForm() {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Scholarship for ..." type="text" {...field} />
+                <Input placeholder="Spending request for ..." type="text" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -125,11 +120,13 @@ export default function RequestForm() {
           name="requestAmount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Goal</FormLabel>
+              <FormLabel>Amount</FormLabel>
               <FormControl>
                 <Input placeholder="(e.g.) 10" type="number" {...field} />
               </FormControl>
-              <FormDescription>Enter amount of ethers you aims to request.</FormDescription>
+              <FormDescription>
+                Enter amount of ethers you aims to request. (max 30% of the program fund)
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
