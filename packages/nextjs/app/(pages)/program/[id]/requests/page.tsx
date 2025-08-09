@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,7 +14,11 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { ArrowLeft, FilePlus } from "lucide-react";
+import RequestForm from "~~/components/ui/RequestForm";
+import { Badge } from "~~/components/ui/badge";
 import { Button } from "~~/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "~~/components/ui/dialog";
 import { Progress } from "~~/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~~/components/ui/table";
 
@@ -150,7 +156,11 @@ export const columns: ColumnDef<Request>[] = [
   {
     accessorKey: "status",
     header: () => <div className="text-center w-20">Status</div>,
-    cell: ({ row }) => <div className="capitalize bg-amber-400 w-20 text-center">{row.getValue("status")}</div>,
+    cell: ({ row }) => {
+      const status = row.getValue("status") as string;
+      const bgColor = status === "processing" ? "bg-amber-600" : status === "success" ? "bg-green-600" : "bg-red-500";
+      return <Badge className={`capitalize ${bgColor} dark:text-white w-20 text-center`}>{status}</Badge>;
+    },
   },
   {
     accessorKey: "date",
@@ -159,6 +169,9 @@ export const columns: ColumnDef<Request>[] = [
   },
 ];
 const Page = () => {
+  const params = useParams();
+  const programId = params.id as string;
+  const [showForm, setShowForm] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -180,12 +193,34 @@ const Page = () => {
   });
   return (
     <div className="w-full h-full py-20 px-10 mt-5">
-      <div className="flex items-center py-4"></div>
+      <div className="flex items-center justify-between py-4">
+        <Link href={`/program/${programId}`}>
+          <button className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800">
+            <ArrowLeft className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:rotate-12 dark:text-neutral-400" />
+          </button>
+        </Link>
+        {/* <Button variant="outline" className="cursor-pointer">
+          Create Requests
+        </Button> */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="cursor-pointer">
+              Create Requests
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Create a New Request</DialogTitle>
+            </DialogHeader>
+            <RequestForm />
+          </DialogContent>
+        </Dialog>
+      </div>
       <div className="overflow-hidden rounded-md border">
         <Table>
-          <TableHeader className="bg-gray-800">
+          <TableHeader className="dark:bg-gray-800">
             {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="text-white">
                 {headerGroup.headers.map(header => {
                   return (
                     <TableHead key={header.id}>
