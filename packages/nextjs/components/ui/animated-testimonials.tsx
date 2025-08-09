@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 type Testimonial = {
   src: string;
 };
-export const AnimatedTestimonials = ({
+const AnimatedTestimonialsComponent = ({
   testimonials,
   autoplay = false,
 }: {
@@ -109,13 +110,13 @@ export const AnimatedTestimonials = ({
           <div className="flex gap-4 pt-12 md:pt-0">
             <button
               onClick={handlePrev}
-              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800"
+              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 z-10 cursor-pointer"
             >
               <ArrowLeft className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:rotate-12 dark:text-neutral-400" />
             </button>
             <button
               onClick={handleNext}
-              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800"
+              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 z-10 cursor-pointer"
             >
               <ArrowRight className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:-rotate-12 dark:text-neutral-400" />
             </button>
@@ -125,3 +126,5 @@ export const AnimatedTestimonials = ({
     </div>
   );
 };
+
+export const AnimatedTestimonials = dynamic(() => Promise.resolve(AnimatedTestimonialsComponent), { ssr: false });

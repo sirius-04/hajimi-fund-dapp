@@ -4,6 +4,7 @@ import EventCard from "~~/components/EventCard";
 import ProgramNotFound from "~~/components/ProgramNotFound";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import GlassIcons from "~~/components/ui/GlassIcons";
+import { BackgroundBeams } from "~~/components/ui/background-beams";
 import { Badge } from "~~/components/ui/badge";
 import { Button } from "~~/components/ui/button";
 import { Separator } from "~~/components/ui/separator";
