@@ -16,6 +16,7 @@ import {
 import { ArrowLeft } from "lucide-react";
 import { formatEther } from "viem";
 import { useAccount, useReadContracts } from "wagmi";
+import StatusBadge from "~~/components/StatusBadge";
 import RequestForm from "~~/components/ui/RequestForm";
 import { BackgroundBeams } from "~~/components/ui/background-beams";
 import { Badge } from "~~/components/ui/badge";
@@ -24,6 +25,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Progress } from "~~/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~~/components/ui/table";
 import programAbi from "~~/contracts/ScholarshipProgram.json";
+import getStatusText from "~~/func/getStatusText";
 
 function RequestDetailsClient({ address }: { address: `0x${string}` }) {
   const account = useAccount();
@@ -106,9 +108,10 @@ function RequestDetailsClient({ address }: { address: `0x${string}` }) {
     },
     {
       accessorKey: "status",
-      header: () => <div className="text-center w-20">Status</div>,
+      header: () => <div className="w-20">Status</div>,
       cell: ({ row }: any) => (
-        <Badge className="capitalize dark:text-white w-20 text-center">{row.getValue("status")}</Badge>
+        // <Badge className="capitalize dark:text-white w-20 text-center">{row.getValue("status")}</Badge>
+        <StatusBadge status={getStatusText("program", Number(row.getValue("status")))} />
       ),
     },
     {
