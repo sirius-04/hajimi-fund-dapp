@@ -1,20 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, ImagePlus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { toast } from "sonner";
+import { useWriteContract } from "wagmi";
+import abi from "~~/contracts/ScholarshipProgram.json";
+import { uploadToIPFS } from "~~/func/ipfs";
 
 type Testimonial = {
   src: string;
 };
-const AnimatedTestimonialsComponent = ({
+export const AnimatedTestimonials = ({
   testimonials,
   autoplay = false,
+  showAddFile,
+  address,
 }: {
   testimonials: Testimonial[];
   autoplay?: boolean;
+  showAddFile: boolean;
+  address: `0x${string}`;
 }) => {
+  const { writeContractAsync } = useWriteContract();
   const [active, setActive] = useState(0);
 
   const handleNext = () => {
@@ -40,9 +48,38 @@ const AnimatedTestimonialsComponent = ({
     return Math.floor(Math.random() * 21) - 10;
   };
 
+  // ---- Input logic ---
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [fileName, setFileName] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
+  const uploadFiles: File[] = [];
+
+  const handleButtonClick = async () => {
+    fileInputRef.current?.click();
+    if (file) {
+      uploadFiles.push(file);
+
+      const promise = uploadToIPFS(uploadFiles);
+
+      toast.promise(promise, {
+        loading: "Uploading",
+        success: () => "Uploaded!",
+        error: "Error",
+      });
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setFileName(selectedFile.name);
+    }
+  };
+
   return (
     <div className="max-w-sm py-10 font-sans antialiased md:max-w-4xl md:px-8 lg:px-12">
-      <div className="flex flex-col gap-15">
+      <div className="flex flex-col">
         <div>
           <div className="relative h-90 w-100">
             <AnimatePresence>
@@ -107,24 +144,38 @@ const AnimatedTestimonialsComponent = ({
               ease: "easeInOut",
             }}
           ></motion.div>
-          <div className="flex gap-4 pt-12 md:pt-0">
-            <button
-              onClick={handlePrev}
-              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 z-10 cursor-pointer"
-            >
-              <ArrowLeft className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:rotate-12 dark:text-neutral-400" />
-            </button>
-            <button
-              onClick={handleNext}
-              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 z-10 cursor-pointer"
-            >
-              <ArrowRight className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:-rotate-12 dark:text-neutral-400" />
-            </button>
+          <div className="flex justify-between items-center pt-12 md:pt-0">
+            <div className="flex gap-4">
+              <button
+                onClick={handlePrev}
+                className="group/button cursor-pointer flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800"
+              >
+                <ArrowLeft className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:rotate-12 dark:text-neutral-400" />
+              </button>
+              <button
+                onClick={handleNext}
+                className="group/button cursor-pointer flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800"
+              >
+                <ArrowRight className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:-rotate-12 dark:text-neutral-400" />
+              </button>
+            </div>
+            <div>
+              {showAddFile && (
+                <button
+                  // onClick={handleNext}
+                  className="group/button cursor-pointer flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800"
+                  onClick={handleButtonClick}
+                >
+                  <ImagePlus className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:-rotate-12 dark:text-neutral-400" />
+                </button>
+              )}
+
+              {/* Hidden file input */}
+              <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-export const AnimatedTestimonials = dynamic(() => Promise.resolve(AnimatedTestimonialsComponent), { ssr: false });

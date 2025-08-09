@@ -42,11 +42,11 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/",
     icon: <Compass className="h-4 w-4" />,
   },
-  {
-    label: "Programs",
-    href: "/userPrograms",
-    icon: <Ticket className="h-4 w-4" />,
-  },
+  // {
+  //   label: "Programs",
+  //   href: "/userPrograms",
+  //   icon: <Ticket className="h-4 w-4" />,
+  // },
 ];
 
 export const HeaderMenuLinks = ({ onClick }: { onClick?: () => void }) => {
@@ -122,7 +122,7 @@ export const Header = () => {
       <div className="flex items-center justify-end gap-2 w-full">
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="lg" className="cursor-pointer">
+            <Button variant="outline" size="lg" className="cursor-pointer">
               <ShinyText>
                 <h1 className="font-black">Create Program</h1>
               </ShinyText>

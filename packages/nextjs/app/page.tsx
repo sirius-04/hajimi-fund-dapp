@@ -15,14 +15,16 @@ import {
 } from "lucide-react";
 import type { NextPage } from "next";
 import { FaEthereum } from "react-icons/fa";
+import { formatEther } from "viem";
 import { ProgramCard } from "~~/components/ProgramCard";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { Button } from "~~/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "~~/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~~/components/ui/tabs";
-import { programList } from "~~/data/dummy1";
+import { useDeployedPrograms } from "~~/hooks/useDeployedPrograms";
 
 const Home: NextPage = () => {
+  const { structuredPrograms } = useDeployedPrograms();
   const [isOpen, setIsOpen] = useState(true);
   const hasMountedOnce = useRef(false);
 
@@ -32,6 +34,17 @@ const Home: NextPage = () => {
       hasMountedOnce.current = true;
     }
   }, [isOpen]);
+
+  const programList =
+    structuredPrograms?.map(p => ({
+      id: p.address,
+      title: p.title ?? "",
+      description: p.description ?? "",
+      badgeText: p.status ?? "",
+      contributors: p.contributors ?? [],
+      date: p.createdAt ? new Date(Number(p.createdAt) * 1000).toDateString() : "",
+      price: p.goal ? Number(formatEther(p.goal)).toFixed(2) : "0.00",
+    })) ?? [];
 
   return (
     <div className="relative w-full mt-18">
