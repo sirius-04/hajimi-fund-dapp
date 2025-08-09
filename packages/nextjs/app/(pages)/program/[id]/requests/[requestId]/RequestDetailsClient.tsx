@@ -48,6 +48,7 @@ function RequestDetailsClient({ requestId }: { requestId: string }) {
   let mediaUrls: { src: string }[] = [];
   let title;
   let description;
+  let status;
 
   if (data) {
     const request: Request = data as Request;
@@ -57,6 +58,7 @@ function RequestDetailsClient({ requestId }: { requestId: string }) {
     const valueEther = Number(formatEther(request.value));
     const createdDate = new Date(Number(request.createdAt) * 1000);
     const votingDeadlineDate = new Date(Number(request.votingDeadline) * 1000);
+    status = request.status;
 
     mediaUrls = request.mediaCIDs.map(cid => ({ src: getIpfsUrl(cid) }));
 
@@ -72,6 +74,13 @@ function RequestDetailsClient({ requestId }: { requestId: string }) {
     functionName: "votesByRequest",
     args: [requestId, account.address],
   });
+
+  const { data: creator } = useReadContract({
+    address: programId,
+    abi: abi,
+    functionName: "creator",
+  });
+  const isCreator = creator == account.address;
 
   const { data: isApproverRaw } = useReadContract({
     address: programId,
@@ -108,6 +117,21 @@ function RequestDetailsClient({ requestId }: { requestId: string }) {
     toast.promise(promise, {
       loading: "Voting",
       success: () => "Voted!",
+      error: "Error",
+    });
+  }
+
+  function handleFinalize() {
+    const promise = writeContractAsync({
+      abi: abi,
+      address: programId,
+      functionName: "finalizeRequest",
+      args: [requestId],
+    });
+
+    toast.promise(promise, {
+      loading: "Finalizing",
+      success: () => "Finalized!",
       error: "Error",
     });
   }
@@ -178,6 +202,11 @@ function RequestDetailsClient({ requestId }: { requestId: string }) {
             <h2 className="font-bold text-2xl underline">Request Description</h2>
             <div className="mt-4 text-muted-foreground">{description}</div>
             {isApprover && voteData == 0 && voteButtons}
+            {status == 1 && isCreator && (
+              <Button variant="default" onClick={handleFinalize} className="mt-10">
+                Finalize Request
+              </Button>
+            )}
           </div>
         </div>
       ) : (
@@ -187,6 +216,11 @@ function RequestDetailsClient({ requestId }: { requestId: string }) {
             <h2 className="font-bold text-2xl underline">Request Description</h2>
             <div className="mt-4 text-muted-foreground">{description}</div>
             {isApprover && voteData == 0 && voteButtons}
+            {status == 1 && isCreator && (
+              <Button variant="default" onClick={handleFinalize}>
+                Finalize Request
+              </Button>
+            )}
           </div>
         </>
       )}
