@@ -122,7 +122,7 @@ export const Header = () => {
       <div className="flex items-center justify-end gap-2 w-full">
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline" size="lg" className="cursor-pointer">
+            <Button variant="ghost" size="lg" className="cursor-pointer">
               <ShinyText>
                 <h1 className="font-black">Create Program</h1>
               </ShinyText>
