@@ -114,7 +114,7 @@ function ApprovalsCell() {
   return <Progress value={progress} className="w-30 mx-auto" />;
 }
 
-export const columns: ColumnDef<Request>[] = [
+const columns: ColumnDef<Request>[] = [
   {
     accessorKey: "id",
     header: () => {

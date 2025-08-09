@@ -31,7 +31,7 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
         <main className="relative flex-1 overflow-hidden">{children}</main>
         <Footer />
       </div>
-      <Toaster position="top-left" />
+      <Toaster position="top-center" />
     </>
   );
 };
