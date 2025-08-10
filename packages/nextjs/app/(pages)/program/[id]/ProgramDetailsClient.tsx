@@ -9,6 +9,7 @@ import { useAccount, useReadContracts, useWriteContract } from "wagmi";
 import StatusBadge from "~~/components/StatusBadge";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import GradientText from "~~/components/ui/GradientText";
+import RequestForm from "~~/components/ui/RequestForm";
 import { Modal, ModalTrigger } from "~~/components/ui/animated-modal";
 import { AnimatedTestimonials } from "~~/components/ui/animated-testimonials";
 import { BackgroundBeams } from "~~/components/ui/background-beams";
@@ -16,6 +17,14 @@ import { BackgroundGradient } from "~~/components/ui/background-gradient";
 import { Badge } from "~~/components/ui/badge";
 import { Button } from "~~/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~~/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~~/components/ui/dialog";
 import { PlaceholdersAndVanishInput } from "~~/components/ui/placeholders-and-vanish-input";
 import { Progress } from "~~/components/ui/progress";
 import { Skeleton } from "~~/components/ui/skeleton";
@@ -221,12 +230,24 @@ function ProgramDetailsClient({ address }: { address: `0x${string}` }) {
                       </Modal>
                     )}
 
-                    {isCreator && (
-                      <Link href={`/program/${address}/requests`} className="w-full">
-                        <Button variant="outline" className="w-full">
-                          Create Request
-                        </Button>
-                      </Link>
+                    {isCreator && statusText == "Active" && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="w-full">
+                            Create Request
+                          </Button>
+                        </DialogTrigger>
+
+                        <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle>Create Request</DialogTitle>
+                            <DialogDescription>Enter the request details</DialogDescription>
+                          </DialogHeader>
+                          <div className="grid gap-4">
+                            <RequestForm address={address} />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     )}
 
                     {(isCreator || isContributor) && (

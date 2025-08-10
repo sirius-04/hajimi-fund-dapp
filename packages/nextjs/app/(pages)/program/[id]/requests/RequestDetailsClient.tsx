@@ -59,19 +59,20 @@ function RequestDetailsClient({ address }: { address: `0x${string}` }) {
     ];
   }
 
-  let requestData: any[] = [];
-
-  if (data && Array.isArray(data[0]?.result)) {
-    requestData = data[0].result.map((req: any) => ({
-      id: Number(req.id),
-      title: req.title,
-      description: req.description,
-      amount: Number(formatEther(req.value)),
-      approvals: Number(req.approvalCount),
-      status: req.status,
-      createdAt: new Date(Number(req.createdAt) * 1000).toLocaleDateString(),
-    }));
-  }
+  const requestData = React.useMemo(() => {
+    if (data && Array.isArray(data[0]?.result)) {
+      return data[0].result.map((req: any) => ({
+        id: Number(req.id),
+        title: req.title,
+        description: req.description,
+        amount: Number(formatEther(req.value)),
+        approvalCount: Number(req.approvalCount),
+        status: req.status,
+        createdAt: new Date(Number(req.createdAt) * 1000).toLocaleDateString(),
+      }));
+    }
+    return [];
+  }, [data]);
 
   const columns = [
     {
@@ -87,7 +88,10 @@ function RequestDetailsClient({ address }: { address: `0x${string}` }) {
         return <Button variant="ghost">Title</Button>;
       },
       cell: ({ row }: any) => (
-        <Link href="/requests" className="cursor-pointer hover:underline lowercase">
+        <Link
+          href={`/program/${address}/requests/${row.getValue("id")}`}
+          className="cursor-pointer hover:underline lowercase"
+        >
           {row.getValue("title")}
         </Link>
       ),
