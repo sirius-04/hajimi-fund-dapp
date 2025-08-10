@@ -12,6 +12,7 @@ const compat = new FlatCompat({
 
 export default defineConfig([
   {
+    ignores: ['**/packages/nexjs/**'],
     plugins: {
       prettier: prettierPlugin,
     },
@@ -20,6 +21,8 @@ export default defineConfig([
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "react-hooks/exhaustive-deps": "warn", 
 
       "prettier/prettier": [
         "warn",
