@@ -3,8 +3,9 @@
 import React from "react";
 import Link from "next/link";
 import { FaEthereum } from "react-icons/fa";
-import { formatEther, getAddress } from "viem";
-import { useAccount, useReadContracts } from "wagmi";
+import { toast } from "sonner";
+import { formatEther, getAddress, parseEther } from "viem";
+import { useAccount, useReadContracts, useWriteContract } from "wagmi";
 import StatusBadge from "~~/components/StatusBadge";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import GradientText from "~~/components/ui/GradientText";
@@ -24,6 +25,7 @@ import { getIpfsUrl } from "~~/func/ipfs";
 
 function ProgramDetailsClient({ address }: { address: `0x${string}` }) {
   const account = useAccount();
+  const { writeContractAsync } = useWriteContract();
   const { data, isPending } = useReadContracts({
     contracts: [
       {
@@ -85,6 +87,23 @@ function ProgramDetailsClient({ address }: { address: `0x${string}` }) {
 
     return () => clearTimeout(timer);
   }, [percentage]);
+
+  function handleContribute() {
+    setShowInput(false);
+
+    const promise = writeContractAsync({
+      abi: programAbi,
+      address: address,
+      functionName: "contribute",
+      value: parseEther(amount || "0"),
+    });
+
+    toast.promise(promise, {
+      loading: "Contributing",
+      success: () => "Contributed! Thanks!",
+      error: "Error",
+    });
+  }
 
   return (
     <div className="w-full h-full py-20">
@@ -227,10 +246,7 @@ function ProgramDetailsClient({ address }: { address: `0x${string}` }) {
                           onChange={e => {
                             setAmount(e.target.value);
                           }}
-                          onSubmit={e => {
-                            e.preventDefault();
-                            setShowInput(false);
-                          }}
+                          onSubmit={handleContribute}
                         />
                         <div className="mt-4 flex justify-end">
                           <Button variant="outline" onClick={() => setShowInput(false)}>
@@ -271,4 +287,66 @@ export function PlaceholdersAndVanishInputDemo() {
     console.log("submitted");
   };
   return <PlaceholdersAndVanishInput placeholders={placeholders} onChange={handleChange} onSubmit={onSubmit} />;
+}
+function writeContractAsync(arg0: {
+  abi: (
+    | {
+        inputs: { internalType: string; name: string; type: string }[];
+        stateMutability: string;
+        type: string;
+        name?: undefined;
+        anonymous?: undefined;
+        outputs?: undefined;
+      }
+    | {
+        inputs: never[];
+        name: string;
+        type: string;
+        stateMutability?: undefined;
+        anonymous?: undefined;
+        outputs?: undefined;
+      }
+    | {
+        anonymous: boolean;
+        inputs: { indexed: boolean; internalType: string; name: string; type: string }[];
+        name: string;
+        type: string;
+        stateMutability?: undefined;
+        outputs?: undefined;
+      }
+    | {
+        stateMutability: string;
+        type: string;
+        inputs?: undefined;
+        name?: undefined;
+        anonymous?: undefined;
+        outputs?: undefined;
+      }
+    | {
+        inputs: { internalType: string; name: string; type: string }[];
+        name: string;
+        outputs: { internalType: string; name: string; type: string }[];
+        stateMutability: string;
+        type: string;
+        anonymous?: undefined;
+      }
+    | {
+        inputs: { internalType: string; name: string; type: string }[];
+        name: string;
+        outputs: {
+          components: { internalType: string; name: string; type: string }[];
+          internalType: string;
+          name: string;
+          type: string;
+        }[];
+        stateMutability: string;
+        type: string;
+        anonymous?: undefined;
+      }
+  )[];
+  address: `0x${string}`;
+  functionName: string;
+  value: any;
+}) {
+  throw new Error("Function not implemented.");
 }
